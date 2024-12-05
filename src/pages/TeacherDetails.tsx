@@ -140,7 +140,7 @@ function TeacherDetails() {
 
       try {
         const response = await fetch(
-          `http://167.114.0.177:81/professeurs/${id}/details/`
+          `http://162.19.205.65:81/professeurs/${id}/details/`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch student details");
@@ -500,7 +500,7 @@ function TeacherDetails() {
                 <div className="text-right">
                   <span
                     className={`px-2 py-1 rounded-full text-xs ${
-                      commission.statut_comission.toLowerCase() === "paid"
+                      commission.statut_comission === "paid"
                         ? "bg-green-100 text-green-800"
                         : "bg-yellow-100 text-yellow-800"
                     }`}

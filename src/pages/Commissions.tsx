@@ -149,7 +149,7 @@ const columns: ColumnDef<Commission>[] = [
     cell: ({ row }) => (
       <span
         className={`px-2 py-1 rounded-full text-xs ${
-          row.original.statut_comission === "Paid"
+          row.original.statut_comission === "PAID"
             ? "bg-green-100 text-green-800"
             : "bg-yellow-100 text-yellow-800"
         }`}
@@ -434,7 +434,7 @@ function Commissions() {
 
   useEffect(() => {
     // Fetch data from the API
-    fetch("http://167.114.0.177:81/commissions/")
+    fetch("http://162.19.205.65:81/commissions/?ordering=-date_comission")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

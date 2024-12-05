@@ -9,6 +9,7 @@ import type { Teacher } from "../types";
 import { createTeacher } from "../services/api";
 import axios from "axios";
 import ConfirmationDialog from "../components/ConfirmationDialog";
+import { Bounce, toast } from "react-toastify";
 
 const data: Teacher[] = [
   {
@@ -37,176 +38,6 @@ const data: Teacher[] = [
   },
 ];
 
-function TeacherForm({
-  onSubmit,
-  onClose,
-}: {
-  onSubmit: (data: any) => void;
-  onClose: () => void;
-}) {
-  const [formData, setFormData] = useState({
-    nom: "",
-    prenom: "",
-    telephone: "",
-    adresse: "",
-    date_naissance: "",
-    sexe: "M",
-    nationalite: "",
-    specialite: "",
-  });
-
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   onSubmit({
-  //     ...formData,
-  //     id: Date.now(),
-  //     created_at: new Date().toISOString(),
-  //   });
-  //   onClose();
-  // };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const createdTch = await createTeacher(formData);
-    onSubmit(formData);
-    onClose();
-    if (createdTch) {
-      alert("Teacher created successfully!");
-    } else {
-      alert("Failed to create group.");
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            First Name
-          </label>
-          <input
-            type="text"
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            value={formData.prenom}
-            onChange={(e) =>
-              setFormData({ ...formData, prenom: e.target.value })
-            }
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Last Name
-          </label>
-          <input
-            type="text"
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            value={formData.nom}
-            onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
-          />
-        </div>
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Specialty
-        </label>
-        <input
-          type="text"
-          required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          value={formData.specialite}
-          onChange={(e) =>
-            setFormData({ ...formData, specialite: e.target.value })
-          }
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Birth Date
-        </label>
-        <input
-          type="date"
-          required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          value={formData.date_naissance}
-          onChange={(e) =>
-            setFormData({ ...formData, date_naissance: e.target.value })
-          }
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Phone</label>
-        <input
-          type="tel"
-          required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          value={formData.telephone}
-          onChange={(e) =>
-            setFormData({ ...formData, telephone: e.target.value })
-          }
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Address
-        </label>
-        <input
-          type="text"
-          required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          value={formData.adresse}
-          onChange={(e) =>
-            setFormData({ ...formData, adresse: e.target.value })
-          }
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Gender
-        </label>
-        <select
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          value={formData.sexe}
-          onChange={(e) => setFormData({ ...formData, sexe: e.target.value })}
-        >
-          <option value="M">Male</option>
-          <option value="F">Female</option>
-        </select>
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Nationality
-        </label>
-        <input
-          type="text"
-          required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          value={formData.nationalite}
-          onChange={(e) =>
-            setFormData({ ...formData, nationalite: e.target.value })
-          }
-        />
-      </div>
-      <div className="flex justify-end space-x-3 mt-6">
-        <button
-          type="button"
-          onClick={onClose}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-        >
-          Add Teacher
-        </button>
-      </div>
-    </form>
-  );
-}
-
 function Teachers() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -214,18 +45,19 @@ function Teachers() {
   const navigate = useNavigate();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [teacherToDelete, setTeacherToDelete] = useState<number | null>(null);
 
   const columns: ColumnDef<Teacher>[] = [
     {
-      header: "First Name",
+      header: "Prénom",
       accessorKey: "prenom",
     },
     {
-      header: "Last Name",
+      header: "Nom",
       accessorKey: "nom",
     },
     {
-      header: "Specialty",
+      header: "Spécialité",
       accessorKey: "specialite",
       cell: ({ row }) => (
         <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
@@ -234,17 +66,17 @@ function Teachers() {
       ),
     },
     {
-      header: "Birth Date",
+      header: "Date de naissance",
       accessorKey: "date_naissance",
       cell: ({ row }) =>
         new Date(row.original.date_naissance).toLocaleDateString(),
     },
     {
-      header: "Phone",
+      header: "Téléphone",
       accessorKey: "telephone",
     },
     {
-      header: "Gender",
+      header: "Genre",
       accessorKey: "sexe",
       cell: ({ row }) => (
         <span
@@ -254,7 +86,7 @@ function Teachers() {
               : "bg-pink-100 text-pink-800"
           }`}
         >
-          {row.original.sexe === "M" ? "Male" : "Female"}
+          {row.original.sexe === "M" ? "Masculin" : "Féminin"}
         </span>
       ),
     },
@@ -270,35 +102,18 @@ function Teachers() {
             <Eye className="w-4 h-4" />
           </button>
           <button
-            onClick={() => setIsDialogOpen(true)}
+            onClick={() => setTeacherToDelete(row.original.id)}
             className="p-1 text-gray-600 hover:text-gray-800"
           >
             <Trash2Icon className="w-4 h-4" />
           </button>
-          <ConfirmationDialog
-            isOpen={isDialogOpen}
-            onConfirm={async () => {
-              await axios.delete(
-                `http://167.114.0.177:81/professeurs/delete/${row.original?.id}/`,
-                {
-                  headers: {
-                    "Content-Type": "application/json", // Define content type as JSON
-                  },
-                }
-              );
-              setIsDialogOpen(false);
-            }}
-            onCancel={() => setIsDialogOpen(false)}
-            message="Do you really want to delete."
-          />
         </div>
       ),
     },
   ];
 
   useEffect(() => {
-    // Fetch data from the API
-    fetch("http://167.114.0.177:81/professeur_list/")
+    fetch("http://162.19.205.65:81/professeur_list/")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -310,13 +125,12 @@ function Teachers() {
         setIsLoading(false);
       })
       .catch((err) => {
-        // setError(err.message);
         setIsLoading(false);
       });
-  }, []);
+  }, [teacherToDelete]);
 
   const handleAddTeacher = (newTeacher: Teacher) => {
-    setTeachers([...teachers, newTeacher]);
+    // setTeachers([...teachers, newTeacher]);
   };
 
   const handleViewTeacher = (teacher: Teacher) => {
@@ -337,35 +151,259 @@ function Teachers() {
     return <LoadingSpinner />;
   }
 
+  function TeacherForm({
+    onSubmit,
+    onClose,
+  }: {
+    onSubmit: (data: any) => void;
+    onClose: () => void;
+  }) {
+    const [formData, setFormData] = useState({
+      nom: "",
+      prenom: "",
+      telephone: "",
+      adresse: "",
+      date_naissance: "",
+      sexe: "M",
+      nationalite: "",
+      specialite: "",
+    });
+
+    // const handleSubmit = (e: React.FormEvent) => {
+    //   e.preventDefault();
+    //   onSubmit({
+    //     ...formData,
+    //     id: Date.now(),
+    //     created_at: new Date().toISOString(),
+    //   });
+    //   onClose();
+    // };
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      const createdTch = await createTeacher(formData);
+      setTeachers([...teachers, createdTch]);
+
+      onSubmit(formData);
+      onClose();
+      if (createdTch) {
+        // alert("Teacher created successfully!");
+      } else {
+        // alert("Failed to create group.");
+      }
+    };
+
+    return (
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Prénom
+            </label>
+            <input
+              type="text"
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              value={formData.prenom}
+              onChange={(e) =>
+                setFormData({ ...formData, prenom: e.target.value })
+              }
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Nom
+            </label>
+            <input
+              type="text"
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              value={formData.nom}
+              onChange={(e) =>
+                setFormData({ ...formData, nom: e.target.value })
+              }
+            />
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Spécialité
+          </label>
+          <input
+            type="text"
+            required
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            value={formData.specialite}
+            onChange={(e) =>
+              setFormData({ ...formData, specialite: e.target.value })
+            }
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Date de naissance
+          </label>
+          <input
+            type="date"
+            required
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            value={formData.date_naissance}
+            onChange={(e) =>
+              setFormData({ ...formData, date_naissance: e.target.value })
+            }
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Téléphone
+          </label>
+          <input
+            type="tel"
+            required
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            value={formData.telephone}
+            onChange={(e) =>
+              setFormData({ ...formData, telephone: e.target.value })
+            }
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Adresse
+          </label>
+          <input
+            type="text"
+            required
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            value={formData.adresse}
+            onChange={(e) =>
+              setFormData({ ...formData, adresse: e.target.value })
+            }
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Genre
+          </label>
+          <select
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            value={formData.sexe}
+            onChange={(e) => setFormData({ ...formData, sexe: e.target.value })}
+          >
+            <option value="M">Masculin</option>
+            <option value="F">Féminin</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Nationalité
+          </label>
+          <input
+            type="text"
+            required
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            value={formData.nationalite}
+            onChange={(e) =>
+              setFormData({ ...formData, nationalite: e.target.value })
+            }
+          />
+        </div>
+        <div className="flex justify-end space-x-3 mt-6">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            Annuler
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+          >
+            Ajouter le professeur
+          </button>
+        </div>
+      </form>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Teachers</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Professeurs</h1>
         <button
           onClick={() => setIsModalOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          Add Teacher
+          Ajouter un professeur
         </button>
       </div>
       <div className="bg-white rounded-lg shadow p-6">
         <DataTable
           columns={columns}
           data={teachersWithActions}
-          searchPlaceholder="Search teachers..."
+          searchPlaceholder="Rechercher des professeurs..."
         />
       </div>
 
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Add New Teacher"
+        title="Ajouter un nouveau professeur"
       >
         <TeacherForm
           onSubmit={handleAddTeacher}
           onClose={() => setIsModalOpen(false)}
         />
       </Modal>
+
+      <ConfirmationDialog
+        isOpen={teacherToDelete !== null}
+        onConfirm={async () => {
+          try {
+            await axios.delete(
+              `http://162.19.205.65:81/professeurs/delete/${teacherToDelete}/`,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+            // Update the UI by removing the deleted teacher
+            setTeachers(
+              teachers.filter((teacher) => teacher.id !== teacherToDelete)
+            );
+            setTeacherToDelete(null);
+            // Show success message
+            toast.success("Supprimé avec succès", {
+              position: "top-center",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+            });
+          } catch (error) {
+            console.error("Error deleting teacher:", error);
+            toast.error("Échec de la suppression", {
+              position: "top-center",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+            });
+          }
+        }}
+        onCancel={() => setTeacherToDelete(null)}
+        message="Voulez-vous vraiment supprimer ce professeur ?"
+      />
     </div>
   );
 }

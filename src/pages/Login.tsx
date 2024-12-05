@@ -22,7 +22,7 @@ function Login() {
     setError(null);
 
     try {
-      const response = await fetch("http://167.114.0.177:81/token", {
+      const response = await fetch("http://162.19.205.65:81/token", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

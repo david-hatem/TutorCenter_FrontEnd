@@ -52,7 +52,7 @@ function Settings() {
 
     try {
       const response = await fetch(
-        "http://167.114.0.177:81/staff/change-password/",
+        "http://162.19.205.65:81/staff/change-password/",
         {
           method: "PUT",
           headers: {
@@ -86,7 +86,7 @@ function Settings() {
     setError("");
 
     try {
-      const response = await fetch("http://167.114.0.177:81/staff/register/", {
+      const response = await fetch("http://162.19.205.65:81/staff/register/", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${cookies.get("authToken")}`,
@@ -120,7 +120,7 @@ function Settings() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch("http://167.114.0.177:81/staff/profile/", {
+        const response = await fetch("http://162.19.205.65:81/staff/profile/", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

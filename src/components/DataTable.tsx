@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -6,8 +6,8 @@ import {
   getPaginationRowModel,
   flexRender,
   ColumnDef,
-} from '@tanstack/react-table';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+} from "@tanstack/react-table";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { useRef } from "react";
@@ -18,8 +18,12 @@ interface DataTableProps<T> {
   searchPlaceholder?: string;
 }
 
-function DataTable<T>({ data, columns, searchPlaceholder = "Search..." }: DataTableProps<T>) {
-  const [globalFilter, setGlobalFilter] = useState('');
+function DataTable<T>({
+  data,
+  columns,
+  searchPlaceholder = "Search...",
+}: DataTableProps<T>) {
+  const [globalFilter, setGlobalFilter] = useState("");
 
   const table = useReactTable({
     data,
@@ -43,8 +47,8 @@ function DataTable<T>({ data, columns, searchPlaceholder = "Search..." }: DataTa
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
         <input
-          value={globalFilter ?? ''}
-          onChange={e => setGlobalFilter(e.target.value)}
+          value={globalFilter ?? ""}
+          onChange={(e) => setGlobalFilter(e.target.value)}
           className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder={searchPlaceholder}
         />
@@ -59,7 +63,10 @@ function DataTable<T>({ data, columns, searchPlaceholder = "Search..." }: DataTa
                     key={header.id}
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    {flexRender(header.column.columnDef.header, header.getContext())}
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
                   </th>
                 ))}
               </tr>
@@ -69,7 +76,10 @@ function DataTable<T>({ data, columns, searchPlaceholder = "Search..." }: DataTa
             {table.getRowModel().rows.map((row) => (
               <tr key={row.id} className="hover:bg-gray-50">
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td
+                    key={cell.id}
+                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
@@ -100,18 +110,18 @@ function DataTable<T>({ data, columns, searchPlaceholder = "Search..." }: DataTa
             <ChevronRight className="h-5 w-5" />
           </button>
           <span className="text-sm text-gray-700">
-            Page {table.getState().pagination.pageIndex + 1} of{' '}
+            Page {table.getState().pagination.pageIndex + 1} of{" "}
             {table.getPageCount()}
           </span>
         </div>
         <select
           value={table.getState().pagination.pageSize}
-          onChange={e => {
+          onChange={(e) => {
             table.setPageSize(Number(e.target.value));
           }}
           className="text-sm border rounded-md px-2 py-1"
         >
-          {[10, 20, 30, 40, 50].map(pageSize => (
+          {[10, 20, 30, 40, 50].map((pageSize) => (
             <option key={pageSize} value={pageSize}>
               Show {pageSize}
             </option>

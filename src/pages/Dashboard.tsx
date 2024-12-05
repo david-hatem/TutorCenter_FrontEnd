@@ -47,7 +47,7 @@ function Dashboard() {
     const fetchMetrics = async () => {
       try {
         const response = await fetch(
-          "http://167.114.0.177:81/dashboard/metrics/"
+          "http://162.19.205.65:81/dashboard/metrics/"
         );
         if (!response.ok) {
           throw new Error(`Error fetching metrics: ${response.status}`);
@@ -61,7 +61,7 @@ function Dashboard() {
     const fetchMonthFinance = async () => {
       try {
         const response = await fetch(
-          "http://167.114.0.177:81/dashboard/financial-metrics/"
+          "http://162.19.205.65:81/dashboard/financial-metrics/"
         );
         if (!response.ok) {
           throw new Error(`Error fetching metrics: ${response.status}`);
@@ -76,7 +76,7 @@ function Dashboard() {
     const fetchWeekFinance = async () => {
       try {
         const response = await fetch(
-          "http://167.114.0.177:81/dashboard/weekly-financial-metrics/"
+          "http://162.19.205.65:81/dashboard/weekly-financial-metrics/"
         );
         if (!response.ok) {
           throw new Error(`Error fetching metrics: ${response.status}`);

@@ -8,6 +8,7 @@ import type { Level } from "../types";
 import { createLevel, updateLevel } from "../services/api";
 import axios from "axios";
 import ConfirmationDialog from "../components/ConfirmationDialog";
+import { Bounce, ToastContainer, toast } from "react-toastify";
 
 const data: Level[] = [
   {
@@ -65,92 +66,6 @@ interface LevelFormData {
   description: string;
 }
 
-function LevelForm({
-  onSubmit,
-  onClose,
-  initialData,
-}: {
-  onSubmit: (data: LevelFormData) => void;
-  onClose: () => void;
-  initialData?: Level;
-}) {
-  const [formData, setFormData] = useState<LevelFormData>({
-    nom_niveau: initialData?.nom_niveau || "",
-    description: initialData?.description || "",
-  });
-
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   onSubmit(formData);
-  //   onClose();
-  // };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const createdLev = !initialData
-      ? await createLevel(formData)
-      : await updateLevel(formData, initialData?.id);
-    onSubmit(formData);
-    onClose();
-    if (!initialData) {
-      if (createdLev) {
-        alert("Level created successfully!");
-      } else {
-        alert("Failed to create level.");
-      }
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Level Name
-        </label>
-        <input
-          type="text"
-          required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          value={formData.nom_niveau}
-          onChange={(e) =>
-            setFormData({ ...formData, nom_niveau: e.target.value })
-          }
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Description
-        </label>
-        <textarea
-          required
-          rows={3}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          value={formData.description}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
-        />
-      </div>
-      <div className="flex justify-end space-x-3 mt-6">
-        <button
-          type="button"
-          onClick={onClose}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-        >
-          {initialData ? "Update Level" : "Add Level"}
-        </button>
-      </div>
-    </form>
-  );
-}
-
 function LevelDetails({
   level,
   onClose,
@@ -162,7 +77,7 @@ function LevelDetails({
     <div className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700">
-          Level Name
+          Nom du niveau
         </label>
         <p className="mt-1 text-sm text-gray-900">{level.nom_niveau}</p>
       </div>
@@ -174,7 +89,7 @@ function LevelDetails({
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700">
-          Created At
+          Créé le
         </label>
         <p className="mt-1 text-sm text-gray-900">
           {new Date(level.created_at).toLocaleDateString()}
@@ -185,7 +100,7 @@ function LevelDetails({
           onClick={onClose}
           className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
         >
-          Close
+          Fermer
         </button>
       </div>
     </div>
@@ -201,10 +116,15 @@ function Levels() {
   const [levels, setLevels] = useState([]);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [levelToDelete, setLevelToDelete] = useState<number | null>(null);
 
   const columns: ColumnDef<Level>[] = [
     {
-      header: "Level Name",
+      header: "ID",
+      accessorKey: "id",
+    },
+    {
+      header: "Nom du niveau",
       accessorKey: "nom_niveau",
       cell: ({ row }) => (
         <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
@@ -217,7 +137,7 @@ function Levels() {
       accessorKey: "description",
     },
     {
-      header: "Created At",
+      header: "Créé le",
       accessorKey: "created_at",
       cell: ({ row }) => new Date(row.original.created_at).toLocaleDateString(),
     },
@@ -239,36 +159,18 @@ function Levels() {
             <Edit className="w-4 h-4" />
           </button>
           <button
-            // onClick={() => row.original.onEdit?.(row.original)}
-            onClick={() => setIsDialogOpen(true)}
+            onClick={() => setLevelToDelete(row.original.id)}
             className="p-1 text-gray-600 hover:text-gray-800"
           >
             <Trash2Icon className="w-4 h-4" />
           </button>
-          <ConfirmationDialog
-            isOpen={isDialogOpen}
-            onConfirm={async () => {
-              await axios.delete(
-                `http://167.114.0.177:81/niveaux/delete/${row.original?.id}/`,
-                {
-                  headers: {
-                    "Content-Type": "application/json", // Define content type as JSON
-                  },
-                }
-              );
-              setIsDialogOpen(false);
-            }}
-            onCancel={() => setIsDialogOpen(false)}
-            message="Do you really want to delete."
-          />
         </div>
       ),
     },
   ];
 
   useEffect(() => {
-    // Fetch data from the API
-    fetch("http://167.114.0.177:81/niveau_list/")
+    fetch("http://162.19.205.65:81/niveau_list/")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -280,18 +182,17 @@ function Levels() {
         setIsLoading(false);
       })
       .catch((err) => {
-        // setError(err.message);
         setIsLoading(false);
       });
-  }, []);
+  }, [levelToDelete]);
 
   const handleAddLevel = (formData: LevelFormData) => {
     const newLevel: Level = {
       ...formData,
-      id: Date.now(),
+      // id: formData.id,
       created_at: new Date().toISOString(),
     };
-    setLevels([...levels, newLevel]);
+    // setLevels([...levels, newLevel]);
   };
 
   const handleEditLevel = (formData: LevelFormData) => {
@@ -323,22 +224,109 @@ function Levels() {
     return <LoadingSpinner />;
   }
 
+  function LevelForm({
+    onSubmit,
+    onClose,
+    initialData,
+  }: {
+    onSubmit: (data: LevelFormData) => void;
+    onClose: () => void;
+    initialData?: Level;
+  }) {
+    const [formData, setFormData] = useState<LevelFormData>({
+      nom_niveau: initialData?.nom_niveau || "",
+      description: initialData?.description || "",
+    });
+
+    // const handleSubmit = (e: React.FormEvent) => {
+    //   e.preventDefault();
+    //   onSubmit(formData);
+    //   onClose();
+    // };
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+
+      const createdLev = !initialData
+        ? await createLevel(formData)
+        : await updateLevel(formData, initialData?.id);
+      setLevels([...levels, createdLev]);
+
+      onSubmit(formData);
+      onClose();
+      if (!initialData) {
+        if (createdLev) {
+          // alert("Level created successfully!");
+        } else {
+          // alert("Failed to create level.");
+        }
+      }
+    };
+
+    return (
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Nom du niveau
+          </label>
+          <input
+            type="text"
+            required
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            value={formData.nom_niveau}
+            onChange={(e) =>
+              setFormData({ ...formData, nom_niveau: e.target.value })
+            }
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Description
+          </label>
+          <textarea
+            rows={3}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            value={formData.description}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
+          />
+        </div>
+        <div className="flex justify-end space-x-3 mt-6">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            Annuler
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+          >
+            {initialData ? "Modifier le niveau" : "Ajouter le niveau"}
+          </button>
+        </div>
+      </form>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Levels</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Niveaux</h1>
         <button
           onClick={() => setIsAddModalOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          Add Level
+          Ajouter un niveau
         </button>
       </div>
       <div className="bg-white rounded-lg shadow p-6">
         <DataTable
           columns={columns}
           data={levelsWithActions}
-          searchPlaceholder="Search levels..."
+          searchPlaceholder="Rechercher des niveaux..."
         />
       </div>
 
@@ -346,7 +334,7 @@ function Levels() {
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title="Add New Level"
+        title="Ajouter un nouveau niveau"
       >
         <LevelForm
           onSubmit={handleAddLevel}
@@ -361,7 +349,7 @@ function Levels() {
           setIsEditModalOpen(false);
           setSelectedLevel(null);
         }}
-        title="Edit Level"
+        title="Modifier le niveau"
       >
         {selectedLevel && (
           <LevelForm
@@ -382,7 +370,7 @@ function Levels() {
           setIsViewModalOpen(false);
           setSelectedLevel(null);
         }}
-        title="Level Details"
+        title="Détails du niveau"
       >
         {selectedLevel && (
           <LevelDetails
@@ -394,6 +382,54 @@ function Levels() {
           />
         )}
       </Modal>
+
+      <ConfirmationDialog
+        isOpen={levelToDelete !== null}
+        onConfirm={async () => {
+          try {
+            await axios.delete(
+              `http://162.19.205.65:81/niveaux/delete/${levelToDelete}/`,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+            // Update the UI by removing the deleted level
+            setLevels(levels.filter((level) => level.id !== levelToDelete));
+            setLevelToDelete(null);
+            // Show success message
+            toast.error("Supprimé avec succès", {
+              position: "top-center",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+            });
+            // alert("Level deleted successfully");
+          } catch (error) {
+            console.error("Error deleting level:", error);
+            // alert("Failed to delete level");
+            toast.error("Échec de la suppression", {
+              position: "top-center",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              // transition: Bounce,
+            });
+          }
+        }}
+        onCancel={() => setLevelToDelete(null)}
+        message="Voulez-vous vraiment supprimer ce niveau ?"
+      />
     </div>
   );
 }

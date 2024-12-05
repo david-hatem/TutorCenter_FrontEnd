@@ -51,12 +51,12 @@ const columns: ColumnDef<Payment>[] = [
     cell: ({ row }) => (
       <span
         className={`px-2 py-1 rounded-full text-xs ${
-          row.original.statut_paiement.toLowerCase() === "paid"
+          row.original.statut_paiement === "PAID"
             ? "bg-green-100 text-green-800"
             : "bg-yellow-100 text-yellow-800"
         }`}
       >
-        {row.original.statut_paiement.toLowerCase()}
+        {row.original.statut_paiement}
       </span>
     ),
   },
@@ -81,7 +81,7 @@ const columns: ColumnDef<Payment>[] = [
         >
           <Printer className="w-4 h-4" />
         </button>
-        {row.original.statut_paiement.toLowerCase() === "partial" && (
+        {row.original.statut_paiement === "PARTIAL" && (
           <button
             onClick={() => row.original.onCompletePayment?.(row.original)}
             className="p-1 text-blue-600 hover:text-blue-800"
@@ -99,13 +99,13 @@ function PrintablePayment({ payment }: { payment: Payment }) {
   return (
     <div className="p-8 bg-white" id="printable-payment">
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold">Payment Receipt</h1>
+        <h1 className="text-2xl font-bold">Reçu de Paiement</h1>
         <p className="text-gray-500">#{payment.id}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-8">
         <div>
-          <h2 className="font-bold mb-2">Student Information</h2>
+          <h2 className="font-bold mb-2">Informations de l'Étudiant</h2>
           <p>
             {payment.etudiant.prenom} {payment.etudiant.nom}
           </p>
@@ -113,33 +113,34 @@ function PrintablePayment({ payment }: { payment: Payment }) {
           <p>{payment.etudiant.adresse}</p>
         </div>
         <div className="text-right">
-          <h2 className="font-bold mb-2">Payment Details</h2>
-          <p>Date: {new Date(payment.date_paiement).toLocaleDateString()}</p>
-          <p>Status: {payment.statut_paiement}</p>
-          <p>Group: {payment.groupe.nom_groupe}</p>
+          <h2 className="font-bold mb-2">Détails du Paiement</h2>
+          <p>Date : {new Date(payment.date_paiement).toLocaleDateString()}</p>
+          <p>Statut : {payment.statut_paiement}</p>
+          <p>Groupe : {payment.groupe.nom_groupe}</p>
+          <p>Montant Restant : {payment.remaining} MAD</p>
         </div>
       </div>
 
       <div className="border-t border-b border-gray-200 py-4 mb-8">
         <div className="flex justify-between mb-2">
-          <span className="font-bold">Amount Paid:</span>
-          <span>${payment.montant.toLocaleString()}</span>
+          <span className="font-bold">Montant Payé :</span>
+          <span>{payment.montant.toLocaleString()} MAD</span>
         </div>
-        {payment.montant_total && payment.statut_paiement === "Partial" && (
+        {payment.montant_total && payment.statut_paiement === "Partiel" && (
           <div className="flex justify-between mb-2">
-            <span className="font-bold">Total Amount:</span>
-            <span>${payment.montant_total.toLocaleString()}</span>
+            <span className="font-bold">Montant Total :</span>
+            <span>{payment.montant_total.toLocaleString()} MAD</span>
           </div>
         )}
-        <div className="flex justify-between">
-          <span className="font-bold">Commission Rate:</span>
+        {/* <div className="flex justify-between">
+          <span className="font-bold">Taux de Commission :</span>
           <span>{payment.commission_percentage}%</span>
-        </div>
+        </div> */}
       </div>
 
       <div className="text-center text-sm text-gray-500">
-        <p>Thank you for your payment!</p>
-        <p>This is a computer-generated document.</p>
+        <p>Merci pour votre paiement !</p>
+        <p>Ceci est un document généré par ordinateur.</p>
       </div>
     </div>
   );
@@ -241,23 +242,27 @@ function Payments() {
     initialData.reduce((sum, payment) => sum + payment.montant, 0)
   );
 
+  const fetchPayments = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(
+        "http://162.19.205.65:81/paiements/?ordering=-date_paiement"
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setPayments(data.results);
+      setTotalAmount(data.results.reduce((sum, p) => sum + p.montant, 0));
+    } catch (err) {
+      console.error("Error fetching payments:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // Fetch data from the API
-    fetch("http://167.114.0.177:81/paiements/")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setPayments(data.results);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        // setError(err.message);
-        setIsLoading(false);
-      });
+    fetchPayments();
   }, []);
 
   const handlePrint = (payment: Payment) => {
@@ -284,23 +289,36 @@ function Payments() {
         return;
       }
 
-      const newPayment: Payment = {
-        id: Date.now(),
-        montant: paymentData.montant,
-        date_paiement: new Date().toISOString(),
-        statut_paiement:
-          paymentData.montant === remainingAmount ? "Paid" : "Partial",
-        etudiant: selectedPayment.etudiant,
-        groupe: selectedPayment.groupe,
-        commission_percentage: selectedPayment.commission_percentage,
-        montant_total: selectedPayment.montant_total,
-      };
+      // Create new payment through API
+      const response = await fetch(
+        "http://162.19.205.65:81/paiements/create/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(paymentData),
+        }
+      );
 
-      setPayments([...payments, newPayment]);
-      setTotalAmount(totalAmount + paymentData.montant);
-      setIsModalOpen(false);
+      if (response.ok) {
+        // Fetch updated payments list
+        const updatedResponse = await fetch(
+          "http://162.19.205.65:81/paiements/"
+        );
+        const data = await updatedResponse.json();
+
+        setPayments(data.results);
+        setTotalAmount(data.results.reduce((sum, p) => sum + p.montant, 0));
+        setIsModalOpen(false);
+        setSelectedPayment(null);
+        alert("Payment completed successfully");
+      } else {
+        throw new Error("Failed to create payment");
+      }
     } catch (error) {
       console.error("Error creating payment:", error);
+      alert("Failed to complete payment");
     }
   };
 
@@ -379,7 +397,7 @@ function Payments() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Payments</h1>
             <p className="text-sm text-gray-500">
-              Total amount: ${totalAmount.toLocaleString()}
+              Total amount: {totalAmount.toLocaleString()} MAD
             </p>
           </div>
           <button
@@ -407,6 +425,7 @@ function Payments() {
         title={selectedPayment ? "Complete Payment" : "Add New Payment"}
       >
         <PaymentForm
+          fetch={fetchPayments}
           id={selectedPayment?.id}
           onSubmit={handleCreatePayment}
           onClose={() => {

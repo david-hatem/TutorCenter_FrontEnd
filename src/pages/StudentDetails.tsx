@@ -64,32 +64,32 @@ function StudentDetails() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [error, setError] = useState("");
+  const [groups, setGroups] = useState([]);
+  const [selectedGrp, setSelectedGrp] = useState(null);
+  const [fields, setFields] = useState<{ id: number; value: string }[]>([]);
 
-  useEffect(() => {
-    const fetchEtudiantDetails = async () => {
-      setIsLoading(true);
-      setError("");
+  const fetchEtudiantDetails = async () => {
+    setIsLoading(true);
+    setError("");
 
-      try {
-        const response = await fetch(
-          `http://167.114.0.177:81/etudiants/${id}/details/`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch student details");
-        }
-        const data = await response.json();
-        setStudent(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
+    try {
+      const response = await fetch(
+        `http://162.19.205.65:81/etudiants/${id}/details/`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch student details");
       }
-    };
-
+      const data = await response.json();
+      setStudent(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchEtudiantDetails();
   }, [id]);
-
-  const [groups, setGroups] = useState([]);
 
   useEffect(() => {
     const getData = async () => {
@@ -98,9 +98,6 @@ function StudentDetails() {
     };
     getData();
   }, []);
-
-  const [fields, setFields] = useState<{ id: number; value: string }[]>([]);
-  const [selectedGrp, setSelectedGrp] = useState(null);
 
   // Add a new field
   const handleAddField = () => {
@@ -229,9 +226,9 @@ function StudentDetails() {
       onSubmit(formData);
       onClose();
       if (createdStd) {
-        alert("Student created successfully!");
+        // alert("Student created successfully!");
       } else {
-        alert("Failed to create group.");
+        // alert("Failed to create group.");
       }
     };
 
@@ -404,29 +401,51 @@ function StudentDetails() {
       console.log("Creating payment:", paymentData);
 
       // After successful creation, update the student's payments list
-      const newPayment = {
-        id: Date.now(),
-        montant: paymentData.montant,
-        date_paiement: new Date().toISOString(),
-        statut_paiement: paymentData.statut_paiement,
-        groupe:
-          student?.groupes.find((g) => g.id === paymentData.groupe_id)
-            ?.nom_groupe || "",
-      };
+      // const newPayment = {
+      //   id: Date.now(),
+      //   montant: paymentData.montant,
+      //   date_paiement: new Date().toISOString(),
+      //   statut_paiement: paymentData.statut_paiement,
+      //   groupe:
+      //     student?.groupes.find((g) => g.id === paymentData.groupe_id)
+      //       ?.nom_groupe || "",
+      // };
 
-      setStudent((prev) =>
-        prev
-          ? {
-              ...prev,
-              paiements: [...prev.paiements, newPayment],
-              total_paiements: prev.total_paiements + paymentData.montant,
-            }
-          : null
-      );
+      // setStudent((prev) =>
+      //   prev
+      //     ? {
+      //         ...prev,
+      //         paiements: [...prev.paiements, newPayment],
+      //         total_paiements: prev.total_paiements + paymentData.montant,
+      //       }
+      //     : null
+      // );
 
       setIsPaymentModalOpen(false);
     } catch (error) {
       console.error("Error creating payment:", error);
+    }
+  };
+
+  const handleEditStudent = async (formData) => {
+    try {
+      const response = await updateStudent(formData, id);
+      if (response) {
+        // Fetch fresh student data after update
+        const updatedResponse = await fetch(
+          `http://162.19.205.65:81/etudiants/${id}/details/`
+        );
+        if (!updatedResponse.ok) {
+          throw new Error("Failed to fetch updated student details");
+        }
+        const updatedData = await updatedResponse.json();
+        setStudent(updatedData);
+        setIsModalOpen(false);
+        // alert("Student updated successfully");
+      }
+    } catch (error) {
+      console.error("Error updating student:", error);
+      // alert("Failed to update student");
     }
   };
 
@@ -447,6 +466,28 @@ function StudentDetails() {
       </div>
     );
   }
+
+  // const addStdGrp = async () => {
+  //   await addStudentGrp({
+  //     group_id: Number(selectedGrp),
+  //     student_id: Number(id),
+  //   });
+  // };
+
+  const addStdGrp = async () => {
+    try {
+      await addStudentGrp({
+        group_id: Number(selectedGrp),
+        student_id: Number(id),
+      });
+      // Refresh student details after adding to group
+      await fetchEtudiantDetails();
+      // Clear the fields after successful addition
+      setFields([]);
+    } catch (error) {
+      console.error("Error adding student to group:", error);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -557,12 +598,7 @@ function StudentDetails() {
                   </select>
                   <button
                     type="button"
-                    onClick={() => {
-                      addStudentGrp({
-                        group_id: Number(selectedGrp),
-                        student_id: Number(id),
-                      });
-                    }}
+                    onClick={addStdGrp}
                     className="p-2 text-gray-400 hover:text-gray-600"
                   >
                     <PlusCircleIcon className="w-4 h-4" />
@@ -682,11 +718,12 @@ function StudentDetails() {
         title="Add New Payment"
       >
         <PaymentForm
-          onSubmit={handleAddPayment}
+          // onSubmit={handleAddPayment}
           onClose={() => setIsPaymentModalOpen(false)}
           initialStudentId={student.id}
           students={[]}
           groups={student.groupes}
+          fetch2={fetchEtudiantDetails}
         />
       </Modal>
 
@@ -696,8 +733,9 @@ function StudentDetails() {
         title="Edit Student"
       >
         <EditStudentForm
-          onSubmit={() => {}}
+          onSubmit={handleEditStudent}
           onClose={() => setIsModalOpen(false)}
+          initialData={student}
         />
       </Modal>
     </div>

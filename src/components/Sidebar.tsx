@@ -15,14 +15,14 @@ import {
 } from 'lucide-react';
 
 const menuItems = [
-  { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { path: '/students', icon: Users, label: 'Students' },
-  { path: '/teachers', icon: GraduationCap, label: 'Teachers' },
-  { path: '/levels', icon: Layers, label: 'Levels' },
-  { path: '/branches', icon: GitBranch, label: 'Branches' },
-  { path: '/subjects', icon: BookOpen, label: 'Subjects' },
-  { path: '/groups', icon: UsersRound, label: 'Groups' },
-  { path: '/payments', icon: Wallet, label: 'Payments' },
+  { path: '/', icon: LayoutDashboard, label: 'Tableau de bord' },
+  { path: '/students', icon: Users, label: 'Étudiants' },
+  { path: '/teachers', icon: GraduationCap, label: 'Professeurs' },
+  { path: '/levels', icon: Layers, label: 'Niveaux' },
+  { path: '/branches', icon: GitBranch, label: 'Filières' },
+  { path: '/subjects', icon: BookOpen, label: 'Matières' },
+  { path: '/groups', icon: UsersRound, label: 'Groupes' },
+  { path: '/payments', icon: Wallet, label: 'Paiements' },
   { path: '/commissions', icon: PiggyBank, label: 'Commissions' },
   { path: '/expenses', icon: Receipt, label: 'Dépenses' },
   { path: '/bank-withdrawals', icon: Building, label: 'Sorties Banque' },
@@ -32,7 +32,7 @@ function Sidebar() {
   return (
     <aside className="w-64 bg-white border-r border-gray-200">
       <div className="p-6">
-        <h1 className="text-2xl font-bold text-gray-800">Tutor Center</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Delta Institut</h1>
       </div>
       <nav className="mt-6">
         {menuItems.map((item) => (

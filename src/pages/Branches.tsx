@@ -8,6 +8,7 @@ import type { Branch } from "../types";
 import { createBranch, updateBranch, updateSub } from "../services/api";
 import axios from "axios";
 import ConfirmationDialog from "../components/ConfirmationDialog";
+import { Bounce, toast } from "react-toastify";
 
 const data: Branch[] = [
   {
@@ -65,92 +66,6 @@ interface BranchFormData {
   description: string;
 }
 
-function BranchForm({
-  onSubmit,
-  onClose,
-  initialData,
-}: {
-  onSubmit: (data: BranchFormData) => void;
-  onClose: () => void;
-  initialData?: Branch;
-}) {
-  const [formData, setFormData] = useState<BranchFormData>({
-    nom_filiere: initialData?.nom_filiere || "",
-    description: initialData?.description || "",
-  });
-
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   onSubmit(formData);
-  //   onClose();
-  // };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const createdBranch = !initialData
-      ? await createBranch(formData)
-      : await updateBranch(formData, initialData?.id);
-    onSubmit(formData);
-    onClose();
-    if (!initialData) {
-      if (createdBranch) {
-        alert("Branch created successfully!");
-      } else {
-        alert("Failed to create branch.");
-      }
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Branch Name
-        </label>
-        <input
-          type="text"
-          required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          value={formData.nom_filiere}
-          onChange={(e) =>
-            setFormData({ ...formData, nom_filiere: e.target.value })
-          }
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Description
-        </label>
-        <textarea
-          required
-          rows={3}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          value={formData.description}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
-        />
-      </div>
-      <div className="flex justify-end space-x-3 mt-6">
-        <button
-          type="button"
-          onClick={onClose}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-        >
-          {initialData ? "Update Branch" : "Add Branch"}
-        </button>
-      </div>
-    </form>
-  );
-}
-
 function BranchDetails({
   branch,
   onClose,
@@ -162,7 +77,7 @@ function BranchDetails({
     <div className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700">
-          Branch Name
+          Nom de la filière
         </label>
         <p className="mt-1 text-sm text-gray-900">{branch.nom_filiere}</p>
       </div>
@@ -174,7 +89,7 @@ function BranchDetails({
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700">
-          Created At
+          Date de création
         </label>
         <p className="mt-1 text-sm text-gray-900">
           {new Date(branch.created_at).toLocaleDateString()}
@@ -185,7 +100,7 @@ function BranchDetails({
           onClick={onClose}
           className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
         >
-          Close
+          Fermer
         </button>
       </div>
     </div>
@@ -201,10 +116,11 @@ function Branches() {
   const [branches, setBranches] = useState([]);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [branchToDelete, setBranchToDelete] = useState<number | null>(null);
 
   const columns: ColumnDef<Branch>[] = [
     {
-      header: "Branch Name",
+      header: "Nom de la filière",
       accessorKey: "nom_filiere",
       cell: ({ row }) => (
         <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
@@ -217,7 +133,7 @@ function Branches() {
       accessorKey: "description",
     },
     {
-      header: "Created At",
+      header: "Date de création",
       accessorKey: "created_at",
       cell: ({ row }) => new Date(row.original.created_at).toLocaleDateString(),
     },
@@ -239,36 +155,18 @@ function Branches() {
             <Edit className="w-4 h-4" />
           </button>
           <button
-            // onClick={() => row.original.onEdit?.(row.original)}
-            onClick={() => setIsDialogOpen(true)}
+            onClick={() => setBranchToDelete(row.original.id)}
             className="p-1 text-gray-600 hover:text-gray-800"
           >
             <Trash2Icon className="w-4 h-4" />
           </button>
-          <ConfirmationDialog
-            isOpen={isDialogOpen}
-            onConfirm={async () => {
-              await axios.delete(
-                `http://167.114.0.177:81/filieres/delete/${row.original?.id}/`,
-                {
-                  headers: {
-                    "Content-Type": "application/json", // Define content type as JSON
-                  },
-                }
-              );
-              setIsDialogOpen(false);
-            }}
-            onCancel={() => setIsDialogOpen(false)}
-            message="Do you really want to delete."
-          />
         </div>
       ),
     },
   ];
 
   useEffect(() => {
-    // Fetch data from the API
-    fetch("http://167.114.0.177:81/filiere_list/")
+    fetch("http://162.19.205.65:81/filiere_list/")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -280,18 +178,17 @@ function Branches() {
         setIsLoading(false);
       })
       .catch((err) => {
-        // setError(err.message);
         setIsLoading(false);
       });
-  }, []);
+  }, [branchToDelete]);
 
   const handleAddBranch = (formData: BranchFormData) => {
     const newBranch: Branch = {
       ...formData,
-      id: Date.now(),
+      // id: Date.now(),
       created_at: new Date().toISOString(),
     };
-    setBranches([...branches, newBranch]);
+    // setBranches([...branches, newBranch]);
   };
 
   const handleEditBranch = (formData: BranchFormData) => {
@@ -323,22 +220,109 @@ function Branches() {
     return <LoadingSpinner />;
   }
 
+  function BranchForm({
+    onSubmit,
+    onClose,
+    initialData,
+  }: {
+    onSubmit: (data: BranchFormData) => void;
+    onClose: () => void;
+    initialData?: Branch;
+  }) {
+    const [formData, setFormData] = useState<BranchFormData>({
+      nom_filiere: initialData?.nom_filiere || "",
+      description: initialData?.description || "",
+    });
+
+    // const handleSubmit = (e: React.FormEvent) => {
+    //   e.preventDefault();
+    //   onSubmit(formData);
+    //   onClose();
+    // };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+
+      const createdBranch = !initialData
+        ? await createBranch(formData)
+        : await updateBranch(formData, initialData?.id);
+      setBranches([...branches, createdBranch]);
+
+      onSubmit(formData);
+      onClose();
+      if (!initialData) {
+        // if (createdBranch) {
+        //   alert("Branch created successfully!");
+        // } else {
+        //   alert("Failed to create branch.");
+        // }
+      }
+    };
+
+    return (
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Nom de la filière
+          </label>
+          <input
+            type="text"
+            required
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            value={formData.nom_filiere}
+            onChange={(e) =>
+              setFormData({ ...formData, nom_filiere: e.target.value })
+            }
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Description
+          </label>
+          <textarea
+            rows={3}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            value={formData.description}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
+          />
+        </div>
+        <div className="flex justify-end space-x-3 mt-6">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            Annuler
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+          >
+            {initialData ? "Modifier la filière" : "Ajouter la filière"}
+          </button>
+        </div>
+      </form>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Branches</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Filières</h1>
         <button
           onClick={() => setIsAddModalOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          Add Branch
+          Ajouter une filière
         </button>
       </div>
       <div className="bg-white rounded-lg shadow p-6">
         <DataTable
           columns={columns}
           data={branchesWithActions}
-          searchPlaceholder="Search branches..."
+          searchPlaceholder="Rechercher des filières..."
         />
       </div>
 
@@ -346,7 +330,7 @@ function Branches() {
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title="Add New Branch"
+        title="Ajouter une nouvelle filière"
       >
         <BranchForm
           onSubmit={handleAddBranch}
@@ -361,7 +345,7 @@ function Branches() {
           setIsEditModalOpen(false);
           setSelectedBranch(null);
         }}
-        title="Edit Branch"
+        title="Modifier la filière"
       >
         {selectedBranch && (
           <BranchForm
@@ -382,7 +366,7 @@ function Branches() {
           setIsViewModalOpen(false);
           setSelectedBranch(null);
         }}
-        title="Branch Details"
+        title="Détails de la filière"
       >
         {selectedBranch && (
           <BranchDetails
@@ -394,6 +378,50 @@ function Branches() {
           />
         )}
       </Modal>
+
+      <ConfirmationDialog
+        isOpen={!!branchToDelete}
+        onConfirm={async () => {
+          try {
+            await axios.delete(
+              `http://162.19.205.65:81/filieres/delete/${branchToDelete}/`,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+            setBranches(branches.filter((branch) => branch.id !== branchToDelete));
+            setBranchToDelete(null);
+            toast.success("Supprimé avec succès", {
+              position: "top-center",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+            });
+          } catch (error) {
+            console.error("Error deleting branch:", error);
+            toast.error("Échec de la suppression", {
+              position: "top-center",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+            });
+          }
+        }}
+        onCancel={() => setBranchToDelete(null)}
+        message="Voulez-vous vraiment supprimer cette filière ?"
+      />
     </div>
   );
 }
