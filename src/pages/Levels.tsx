@@ -77,7 +77,7 @@ function LevelDetails({
     <div className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700">
-          Nom du niveau
+          Level Name
         </label>
         <p className="mt-1 text-sm text-gray-900">{level.nom_niveau}</p>
       </div>
@@ -89,7 +89,7 @@ function LevelDetails({
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700">
-          Créé le
+          Created At
         </label>
         <p className="mt-1 text-sm text-gray-900">
           {new Date(level.created_at).toLocaleDateString()}
@@ -100,7 +100,7 @@ function LevelDetails({
           onClick={onClose}
           className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
         >
-          Fermer
+          Close
         </button>
       </div>
     </div>
@@ -124,7 +124,7 @@ function Levels() {
       accessorKey: "id",
     },
     {
-      header: "Nom du niveau",
+      header: "Level Name",
       accessorKey: "nom_niveau",
       cell: ({ row }) => (
         <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
@@ -137,7 +137,7 @@ function Levels() {
       accessorKey: "description",
     },
     {
-      header: "Créé le",
+      header: "Created At",
       accessorKey: "created_at",
       cell: ({ row }) => new Date(row.original.created_at).toLocaleDateString(),
     },
@@ -267,7 +267,7 @@ function Levels() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Nom du niveau
+            Level Name
           </label>
           <input
             type="text"
@@ -284,6 +284,7 @@ function Levels() {
             Description
           </label>
           <textarea
+            required
             rows={3}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             value={formData.description}
@@ -298,13 +299,13 @@ function Levels() {
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
           >
-            Annuler
+            Cancel
           </button>
           <button
             type="submit"
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
-            {initialData ? "Modifier le niveau" : "Ajouter le niveau"}
+            {initialData ? "Update Level" : "Add Level"}
           </button>
         </div>
       </form>
@@ -314,19 +315,19 @@ function Levels() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Niveaux</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Levels</h1>
         <button
           onClick={() => setIsAddModalOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          Ajouter un niveau
+          Add Level
         </button>
       </div>
       <div className="bg-white rounded-lg shadow p-6">
         <DataTable
           columns={columns}
           data={levelsWithActions}
-          searchPlaceholder="Rechercher des niveaux..."
+          searchPlaceholder="Search levels..."
         />
       </div>
 
@@ -334,7 +335,7 @@ function Levels() {
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title="Ajouter un nouveau niveau"
+        title="Add New Level"
       >
         <LevelForm
           onSubmit={handleAddLevel}
@@ -349,7 +350,7 @@ function Levels() {
           setIsEditModalOpen(false);
           setSelectedLevel(null);
         }}
-        title="Modifier le niveau"
+        title="Edit Level"
       >
         {selectedLevel && (
           <LevelForm
@@ -370,7 +371,7 @@ function Levels() {
           setIsViewModalOpen(false);
           setSelectedLevel(null);
         }}
-        title="Détails du niveau"
+        title="Level Details"
       >
         {selectedLevel && (
           <LevelDetails
@@ -399,7 +400,7 @@ function Levels() {
             setLevels(levels.filter((level) => level.id !== levelToDelete));
             setLevelToDelete(null);
             // Show success message
-            toast.error("Supprimé avec succès", {
+            toast.error("Deleted Successfully", {
               position: "top-center",
               autoClose: 5000,
               hideProgressBar: false,
@@ -414,7 +415,7 @@ function Levels() {
           } catch (error) {
             console.error("Error deleting level:", error);
             // alert("Failed to delete level");
-            toast.error("Échec de la suppression", {
+            toast.error("Failed to Delete", {
               position: "top-center",
               autoClose: 5000,
               hideProgressBar: false,
@@ -428,7 +429,7 @@ function Levels() {
           }
         }}
         onCancel={() => setLevelToDelete(null)}
-        message="Voulez-vous vraiment supprimer ce niveau ?"
+        message="Do you really want to delete this level?"
       />
     </div>
   );

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Bounce, toast } from "react-toastify";
 
-const API_BASE_URL = "http://your-api-base-url";
+const API_BASE_URL = "http://162.19.205.65:81";
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -36,7 +36,7 @@ export const teachersApi = {
 // export const fetchMonthFinance = async () => {
 //   try {
 //     const response = await axios.get(
-//       "162.19.205.65:81/dashboard/financial-metrics/"
+//       "167.114.0.177:81/dashboard/financial-metrics/"
 //     );
 //     if (response.status === 200) {
 //       return response.data;
@@ -53,7 +53,7 @@ export const teachersApi = {
 // export const fetchWeekFinance = async () => {
 //   try {
 //     const response = await axios.get(
-//       "162.19.205.65:81/dashboard/weekly-financial-metrics/"
+//       "167.114.0.177:81/dashboard/weekly-financial-metrics/"
 //     );
 //     if (response.status === 200) {
 //       return response.data;

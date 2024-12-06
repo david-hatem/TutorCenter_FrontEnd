@@ -89,7 +89,7 @@ function SubjectDetails({
     <div className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700">
-          Nom de la matière
+          Subject Name
         </label>
         <p className="mt-1 text-sm text-gray-900">{subject.nom_matiere}</p>
       </div>
@@ -101,7 +101,7 @@ function SubjectDetails({
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700">
-          Date de création
+          Created At
         </label>
         <p className="mt-1 text-sm text-gray-900">
           {new Date(subject.created_at).toLocaleDateString()}
@@ -112,7 +112,7 @@ function SubjectDetails({
           onClick={onClose}
           className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
         >
-          Fermer
+          Close
         </button>
       </div>
     </div>
@@ -128,11 +128,11 @@ function Subjects() {
   const [subjects, setSubjects] = useState([]);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [subjectToDelete, setSubjectToDelete] = useState<number | null>(null);
+  const [subToDelete, setSubToDelete] = useState<number | null>(null);
 
   const columns: ColumnDef<Subject>[] = [
     {
-      header: "Nom de la matière",
+      header: "Subject Name",
       accessorKey: "nom_matiere",
       cell: ({ row }) => (
         <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
@@ -145,7 +145,7 @@ function Subjects() {
       accessorKey: "description",
     },
     {
-      header: "Date de création",
+      header: "Created At",
       accessorKey: "created_at",
       cell: ({ row }) => new Date(row.original.created_at).toLocaleDateString(),
     },
@@ -167,53 +167,38 @@ function Subjects() {
             <Edit className="w-4 h-4" />
           </button>
           <button
-            onClick={() => setSubjectToDelete(row.original.id)}
+            onClick={() => setSubToDelete(row.original.id)}
             className="p-1 text-gray-600 hover:text-gray-800"
           >
             <Trash2Icon className="w-4 h-4" />
           </button>
           <ConfirmationDialog
-            isOpen={!!subjectToDelete}
+            isOpen={subToDelete !== null}
             onConfirm={async () => {
-              try {
-                await axios.delete(
-                  `http://162.19.205.65:81/matieres/delete/${subjectToDelete}/`,
-                  {
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                  }
-                );
-                setSubjects(subjects.filter((subject) => subject.id !== subjectToDelete));
-                setSubjectToDelete(null);
-                toast.success("Supprimé avec succès", {
-                  position: "top-center",
-                  autoClose: 5000,
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                  theme: "light",
-                  transition: Bounce,
-                });
-              } catch (error) {
-                console.error("Error deleting subject:", error);
-                toast.error("Échec de la suppression", {
-                  position: "top-center",
-                  autoClose: 5000,
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                  theme: "light",
-                  transition: Bounce,
-                });
-              }
+              await axios.delete(
+                `http://162.19.205.65:81/matieres/delete/${subToDelete}/`,
+                {
+                  headers: {
+                    "Content-Type": "application/json", // Define content type as JSON
+                  },
+                }
+              );
+              setSubjects(subjects.filter((s) => s.id !== subToDelete));
+              setSubToDelete(null);
+              toast.error("Deleted Successfully", {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                transition: Bounce,
+              });
             }}
-            onCancel={() => setSubjectToDelete(null)}
-            message="Voulez-vous vraiment supprimer cette matière ?"
+            onCancel={() => setSubToDelete(null)}
+            message="Do you really want to delete."
           />
         </div>
       ),
@@ -237,7 +222,7 @@ function Subjects() {
         // setError(err.message);
         setIsLoading(false);
       });
-  }, [subjectToDelete]);
+  }, [subToDelete]);
 
   const handleAddSubject = (formData: SubjectFormData) => {
     const newSubject: Subject = {
@@ -319,7 +304,7 @@ function Subjects() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Nom de la matière
+            Subject Name
           </label>
           <input
             type="text"
@@ -336,6 +321,7 @@ function Subjects() {
             Description
           </label>
           <textarea
+            required
             rows={3}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             value={formData.description}
@@ -350,13 +336,13 @@ function Subjects() {
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
           >
-            Annuler
+            Cancel
           </button>
           <button
             type="submit"
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
-            {initialData ? "Modifier la matière" : "Ajouter la matière"}
+            {initialData ? "Update Subject" : "Add Subject"}
           </button>
         </div>
       </form>
@@ -366,19 +352,19 @@ function Subjects() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Matières</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Subjects</h1>
         <button
           onClick={() => setIsAddModalOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          Ajouter une matière
+          Add Subject
         </button>
       </div>
       <div className="bg-white rounded-lg shadow p-6">
         <DataTable
           columns={columns}
           data={subjectsWithActions}
-          searchPlaceholder="Rechercher des matières..."
+          searchPlaceholder="Search subjects..."
         />
       </div>
 
@@ -386,7 +372,7 @@ function Subjects() {
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title="Ajouter une nouvelle matière"
+        title="Add New Subject"
       >
         <SubjectForm
           onSubmit={handleAddSubject}
@@ -401,7 +387,7 @@ function Subjects() {
           setIsEditModalOpen(false);
           setSelectedSubject(null);
         }}
-        title="Modifier la matière"
+        title="Edit Subject"
       >
         {selectedSubject && (
           <SubjectForm
@@ -422,7 +408,7 @@ function Subjects() {
           setIsViewModalOpen(false);
           setSelectedSubject(null);
         }}
-        title="Détails de la matière"
+        title="Subject Details"
       >
         {selectedSubject && (
           <SubjectDetails

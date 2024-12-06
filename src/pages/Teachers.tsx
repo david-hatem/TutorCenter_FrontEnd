@@ -49,15 +49,15 @@ function Teachers() {
 
   const columns: ColumnDef<Teacher>[] = [
     {
-      header: "Prénom",
+      header: "First Name",
       accessorKey: "prenom",
     },
     {
-      header: "Nom",
+      header: "Last Name",
       accessorKey: "nom",
     },
     {
-      header: "Spécialité",
+      header: "Specialty",
       accessorKey: "specialite",
       cell: ({ row }) => (
         <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
@@ -66,17 +66,17 @@ function Teachers() {
       ),
     },
     {
-      header: "Date de naissance",
+      header: "Birth Date",
       accessorKey: "date_naissance",
       cell: ({ row }) =>
         new Date(row.original.date_naissance).toLocaleDateString(),
     },
     {
-      header: "Téléphone",
+      header: "Phone",
       accessorKey: "telephone",
     },
     {
-      header: "Genre",
+      header: "Gender",
       accessorKey: "sexe",
       cell: ({ row }) => (
         <span
@@ -86,7 +86,7 @@ function Teachers() {
               : "bg-pink-100 text-pink-800"
           }`}
         >
-          {row.original.sexe === "M" ? "Masculin" : "Féminin"}
+          {row.original.sexe === "M" ? "Male" : "Female"}
         </span>
       ),
     },
@@ -198,7 +198,7 @@ function Teachers() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Prénom
+              First Name
             </label>
             <input
               type="text"
@@ -212,7 +212,7 @@ function Teachers() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Nom
+              Last Name
             </label>
             <input
               type="text"
@@ -227,7 +227,7 @@ function Teachers() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Spécialité
+            Specialty
           </label>
           <input
             type="text"
@@ -241,7 +241,7 @@ function Teachers() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Date de naissance
+            Birth Date
           </label>
           <input
             type="date"
@@ -255,7 +255,7 @@ function Teachers() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Téléphone
+            Phone
           </label>
           <input
             type="tel"
@@ -269,7 +269,7 @@ function Teachers() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Adresse
+            Address
           </label>
           <input
             type="text"
@@ -283,20 +283,20 @@ function Teachers() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Genre
+            Gender
           </label>
           <select
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             value={formData.sexe}
             onChange={(e) => setFormData({ ...formData, sexe: e.target.value })}
           >
-            <option value="M">Masculin</option>
-            <option value="F">Féminin</option>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
           </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Nationalité
+            Nationality
           </label>
           <input
             type="text"
@@ -314,13 +314,13 @@ function Teachers() {
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
           >
-            Annuler
+            Cancel
           </button>
           <button
             type="submit"
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
-            Ajouter le professeur
+            Add Teacher
           </button>
         </div>
       </form>
@@ -330,26 +330,26 @@ function Teachers() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Professeurs</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Teachers</h1>
         <button
           onClick={() => setIsModalOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          Ajouter un professeur
+          Add Teacher
         </button>
       </div>
       <div className="bg-white rounded-lg shadow p-6">
         <DataTable
           columns={columns}
           data={teachersWithActions}
-          searchPlaceholder="Rechercher des professeurs..."
+          searchPlaceholder="Search teachers..."
         />
       </div>
 
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Ajouter un nouveau professeur"
+        title="Add New Teacher"
       >
         <TeacherForm
           onSubmit={handleAddTeacher}
@@ -375,7 +375,8 @@ function Teachers() {
             );
             setTeacherToDelete(null);
             // Show success message
-            toast.success("Supprimé avec succès", {
+            // alert("Teacher deleted successfully");
+            toast.error("Deleted Successfully", {
               position: "top-center",
               autoClose: 5000,
               hideProgressBar: false,
@@ -388,21 +389,11 @@ function Teachers() {
             });
           } catch (error) {
             console.error("Error deleting teacher:", error);
-            toast.error("Échec de la suppression", {
-              position: "top-center",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "light",
-              transition: Bounce,
-            });
+            // alert("Failed to delete teacher");
           }
         }}
         onCancel={() => setTeacherToDelete(null)}
-        message="Voulez-vous vraiment supprimer ce professeur ?"
+        message="Do you really want to delete this teacher?"
       />
     </div>
   );

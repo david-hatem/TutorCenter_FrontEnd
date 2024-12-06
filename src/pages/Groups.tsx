@@ -72,7 +72,7 @@ function Groups() {
 
   const columns: ColumnDef<Group>[] = [
     {
-      header: "Nom du groupe",
+      header: "Group Name",
       accessorKey: "nom_groupe",
       cell: ({ row }) => (
         <div>
@@ -80,13 +80,13 @@ function Groups() {
             {row.original.nom_groupe}
           </span>
           <span className="text-xs text-gray-500">
-            Créé le {new Date(row.original.created_at).toLocaleDateString()}
+            Created {new Date(row.original.created_at).toLocaleDateString()}
           </span>
         </div>
       ),
     },
     {
-      header: "Niveau & Filière",
+      header: "Level & Branch",
       id: "level_branch",
       cell: ({ row }) => (
         <div className="space-y-1">
@@ -100,16 +100,16 @@ function Groups() {
       ),
     },
     {
-      header: "Prix d'inscription",
+      header: "Subscription Price",
       accessorKey: "prix_subscription",
       cell: ({ row }) => (
         <span className="font-medium text-green-600">
-          {row.original.prix_subscription?.toLocaleString() || 0} DH
+          ${row.original.prix_subscription?.toLocaleString() || 0}
         </span>
       ),
     },
     {
-      header: "Capacité",
+      header: "Capacity",
       id: "capacity",
       cell: ({ row }) => (
         <div className="space-y-1">
@@ -120,13 +120,13 @@ function Groups() {
             </span>
           </div>
           <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-            Nombre max d'étudiants
+            Max Students
           </span>
         </div>
       ),
     },
     {
-      header: "Professeurs & Commissions",
+      header: "Teachers & Commissions",
       id: "teachers",
       cell: ({ row }) => (
         <div className="space-y-2">
@@ -139,7 +139,7 @@ function Groups() {
                 {prof.prenom} {prof.nom}
               </span>
               <span className="text-green-600 font-medium">
-                {prof.commission_fixe} DH
+                ${prof.commission_fixe}
               </span>
             </div>
           ))}
@@ -147,14 +147,14 @@ function Groups() {
       ),
     },
     {
-      header: "Matières",
+      header: "Subjects",
       accessorKey: "matieres",
       cell: ({ row }) => (
         <div className="flex flex-wrap gap-1">
           {row.original.matieres.map((subject) => (
             <span
               key={subject.id}
-              className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs"
+              className="inline-block px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs"
             >
               {subject.nom_matiere}
             </span>
@@ -170,14 +170,12 @@ function Groups() {
           <button
             onClick={() => row.original?.onEdit?.(row.original)}
             className="p-1 text-gray-600 hover:text-gray-800"
-            title="Modifier"
           >
             <Edit className="w-4 h-4" />
           </button>
           <button
             onClick={() => setGroupToDelete(row.original.id)}
             className="p-1 text-gray-600 hover:text-gray-800"
-            title="Supprimer"
           >
             <Trash2Icon className="w-4 h-4" />
           </button>
@@ -417,7 +415,7 @@ function Groups() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Nom du groupe
+            Group Name
           </label>
           <input
             type="text"
@@ -432,7 +430,7 @@ function Groups() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Niveau
+            Level
           </label>
           <select
             required
@@ -442,7 +440,7 @@ function Groups() {
               setFormData({ ...formData, niveau: Number(e.target.value) })
             }
           >
-            <option value="">Sélectionner un niveau</option>
+            <option value="">Select a level</option>
             {levels.map((level) => (
               <option key={level.id} value={level.id}>
                 {level.nom_niveau}
@@ -453,7 +451,7 @@ function Groups() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Filière
+            Branch
           </label>
           <select
             required
@@ -463,7 +461,7 @@ function Groups() {
               setFormData({ ...formData, filiere: Number(e.target.value) })
             }
           >
-            <option value="">Sélectionner une filière</option>
+            <option value="">Select a branch</option>
             {branches.map((branch) => (
               <option key={branch.id} value={branch.id}>
                 {branch.nom_filiere}
@@ -474,7 +472,7 @@ function Groups() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Nombre max d'étudiants
+            Max Students
           </label>
           <input
             type="number"
@@ -493,7 +491,7 @@ function Groups() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Prix d'inscription
+            Subscription Price
           </label>
           <input
             type="number"
@@ -514,14 +512,14 @@ function Groups() {
         <div>
           <div className="flex justify-between items-center mb-2">
             <label className="block text-sm font-medium text-gray-700">
-              Professeurs
+              Teachers
             </label>
             <button
               type="button"
               onClick={handleAddTeacher}
               className="text-sm text-blue-600 hover:text-blue-700"
             >
-              + Ajouter un professeur
+              + Add Teacher
             </button>
           </div>
           <div className="space-y-2">
@@ -538,7 +536,7 @@ function Groups() {
                     handleTeacherChange(index, "id", Number(e.target.value))
                   }
                 >
-                  <option value="">Sélectionner un professeur</option>
+                  <option value="">Select a teacher</option>
                   {teachers.map((t) => (
                     <option key={t.id} value={t.id}>
                       {t.prenom} {t.nom} - {t.specialite}
@@ -575,7 +573,7 @@ function Groups() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Matières
+            Subjects
           </label>
           <div className="space-y-2">
             {subjects.map((subject) => (
@@ -609,13 +607,13 @@ function Groups() {
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
           >
-            Annuler
+            Cancel
           </button>
           <button
             type="submit"
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
-            {initialData ? "Mettre à jour le groupe" : "Ajouter un groupe"}
+            {initialData ? "Update Group" : "Add Group"}
           </button>
         </div>
       </form>
@@ -625,26 +623,26 @@ function Groups() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Groupes</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Groups</h1>
         <button
           onClick={() => setIsModalOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          Ajouter un groupe
+          Add Group
         </button>
       </div>
       <div className="bg-white rounded-lg shadow p-6">
         <DataTable
           columns={columns}
           data={grpsWithActions}
-          searchPlaceholder="Rechercher des groupes..."
+          searchPlaceholder="Search groups..."
         />
       </div>
 
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Ajouter un nouveau groupe"
+        title="Add New Group"
       >
         <GroupForm
           onSubmit={handleAddGroup}
@@ -655,7 +653,7 @@ function Groups() {
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        title="Mettre à jour le groupe"
+        title="Update Group"
       >
         {selectedGroup && (
           <GroupForm
@@ -683,7 +681,7 @@ function Groups() {
             setGroupToDelete(null);
             // Show success message
             // alert("Group deleted successfully!");
-            toast.error("Supprimé avec succès", {
+            toast.error("Deleted Successfully", {
               position: "top-center",
               autoClose: 5000,
               hideProgressBar: false,
@@ -700,7 +698,7 @@ function Groups() {
           }
         }}
         onCancel={() => setGroupToDelete(null)}
-        message="Voulez-vous vraiment supprimer ce groupe ?"
+        message="Do you really want to delete this group?"
       />
     </div>
   );

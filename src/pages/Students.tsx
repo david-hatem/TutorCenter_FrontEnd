@@ -133,40 +133,40 @@ function Students() {
 
   const columns: ColumnDef<Student>[] = [
     {
-      header: "Prénom",
+      header: "First Name",
       accessorKey: "prenom",
     },
     {
-      header: "Nom",
+      header: "Last Name",
       accessorKey: "nom",
     },
     {
-      header: "Date de naissance",
+      header: "Birth Date",
       accessorKey: "date_naissance",
       cell: ({ row }) =>
         new Date(row.original.date_naissance).toLocaleDateString(),
     },
     {
-      header: "Téléphone",
+      header: "Phone",
       accessorKey: "telephone",
     },
     {
-      header: "Genre",
+      header: "Gender",
       accessorKey: "sexe",
       cell: ({ row }) => (
         <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+          className={`px-2 py-1 rounded-full text-xs ${
             row.original.sexe === "M"
               ? "bg-blue-100 text-blue-800"
               : "bg-pink-100 text-pink-800"
           }`}
         >
-          {row.original.sexe === "M" ? "Masculin" : "Féminin"}
+          {row.original.sexe === "M" ? "Male" : "Female"}
         </span>
       ),
     },
     {
-      header: "Nationalité",
+      header: "Nationality",
       accessorKey: "nationalite",
     },
     {
@@ -210,51 +210,13 @@ function Students() {
       });
   }, [studentToDelete]);
 
-  const handleAddStudent = async (formData: StudentFormData) => {
-    try {
-      setIsLoading(true);
-      const response = await axios.post(
-        "http://162.19.205.65:81/etudiants/create/",
-        formData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      // Fetch updated student list
-      const updatedStudentsResponse = await axios.get("http://162.19.205.65:81/etudiant_list/");
-      setStudents(updatedStudentsResponse.data);
-      
-      setIsModalOpen(false);
-      toast.success("Étudiant ajouté avec succès", {
-        position: "top-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
-    } catch (error) {
-      console.error("Error creating student:", error);
-      toast.error("Erreur lors de la création de l'étudiant", {
-        position: "top-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleAddStudent = (formData: StudentFormData) => {
+    const newStudent: Student = {
+      ...formData,
+      // id: Date.now(),
+      created_at: new Date().toISOString(),
+    };
+    // setStudents([...students, newStudent]);
   };
 
   const handleViewStudent = (student: Student) => {
@@ -281,32 +243,41 @@ function Students() {
   function StudentForm({
     onSubmit,
     onClose,
-    initialData = null,
   }: {
     onSubmit: (data: StudentFormData) => void;
     onClose: () => void;
-    initialData?: StudentFormData;
   }) {
-    const [formData, setFormData] = useState<StudentFormData>(
-      initialData || {
-        prenom: "",
-        nom: "",
-        date_naissance: "",
-        telephone: "",
-        adresse: "",
-        sexe: "",
-        nationalite: "",
-        contact_urgence: "",
-        groupe_id: null,
-      }
-    );
+    const [formData, setFormData] = useState<StudentFormData>({
+      prenom: "",
+      nom: "",
+      date_naissance: "",
+      telephone: "",
+      adresse: "",
+      sexe: "M",
+      nationalite: "",
+      contact_urgence: "",
+      groupe_id: 0,
+    });
 
     const [groups, setGroups] = useState([]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    // const handleSubmit = (e: React.FormEvent) => {
+    //   e.preventDefault();
+    //   onSubmit(formData);
+    //   onClose();
+    // };
+
+    const handleSubmit = async (e) => {
       e.preventDefault();
-      if (!isLoading) {
-        await onSubmit(formData);
+      const createdStd = await createStudent(formData);
+      setStudents([...students, createdStd]);
+
+      onSubmit(formData);
+      onClose();
+      if (createdStd) {
+        // alert("Student created successfully!");
+      } else {
+        // alert("Failed to create group.");
       }
     };
 
@@ -323,7 +294,7 @@ function Students() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Prénom *
+              First Name
             </label>
             <input
               type="text"
@@ -337,7 +308,7 @@ function Students() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Nom *
+              Last Name
             </label>
             <input
               type="text"
@@ -352,7 +323,7 @@ function Students() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Date de naissance *
+            Birth Date
           </label>
           <input
             type="date"
@@ -366,7 +337,7 @@ function Students() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Téléphone *
+            Phone
           </label>
           <input
             type="tel"
@@ -380,7 +351,7 @@ function Students() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Adresse *
+            Address
           </label>
           <input
             type="text"
@@ -394,22 +365,20 @@ function Students() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Genre *
+            Gender
           </label>
           <select
-            required
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             value={formData.sexe}
             onChange={(e) => setFormData({ ...formData, sexe: e.target.value })}
           >
-            <option value="">Sélectionner</option>
-            <option value="M">Masculin</option>
-            <option value="F">Féminin</option>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
           </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Nationalité *
+            Nationality
           </label>
           <input
             type="text"
@@ -423,7 +392,7 @@ function Students() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Contact d'urgence *
+            Emergency Contact
           </label>
           <input
             type="tel"
@@ -437,7 +406,7 @@ function Students() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Groupe *
+            Group
           </label>
           <select
             required
@@ -447,26 +416,28 @@ function Students() {
               setFormData({ ...formData, groupe_id: parseInt(e.target.value) })
             }
           >
-            <option value="">Sélectionner un groupe</option>
+            <option value="">Select a group</option>
             {groups.map((group) => (
               <option key={group.id} value={group.id}>
-                {group.nom_groupe} - {group.niveau.nom_niveau}
+                {group.nom_groupe} - {group.niveau.nom_niveau} (
+                {group.filiere.nom_filiere})
               </option>
             ))}
           </select>
         </div>
-        <div className="flex justify-end space-x-3">
+        <div className="flex justify-end space-x-3 mt-6">
           <button
+            type="button"
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
           >
-            Annuler
+            Cancel
           </button>
           <button
             type="submit"
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
-            Ajouter l'étudiant
+            Add Student
           </button>
         </div>
       </form>
@@ -476,26 +447,26 @@ function Students() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Étudiants</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Students</h1>
         <button
           onClick={() => setIsModalOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          Ajouter un étudiant
+          Add Student
         </button>
       </div>
       <div className="bg-white rounded-lg shadow p-6">
         <DataTable
           columns={columns}
           data={studentsWithActions}
-          searchPlaceholder="Rechercher des étudiants..."
+          searchPlaceholder="Search students..."
         />
       </div>
 
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Ajouter un nouvel étudiant"
+        title="Add New Student"
       >
         <StudentForm
           onSubmit={handleAddStudent}
@@ -521,7 +492,8 @@ function Students() {
             );
             setStudentToDelete(null);
             // Show success message
-            toast.error("Supprimé avec succès", {
+            // alert("Student deleted successfully");
+            toast.error("Deleted Successfully", {
               position: "top-center",
               autoClose: 5000,
               hideProgressBar: false,
@@ -538,7 +510,7 @@ function Students() {
           }
         }}
         onCancel={() => setStudentToDelete(null)}
-        message="Voulez-vous vraiment supprimer cet étudiant ?"
+        message="Do you really want to delete this student?"
       />
     </div>
   );
