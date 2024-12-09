@@ -28,12 +28,12 @@ const columns: ColumnDef<Payment>[] = [
     cell: ({ row }) => (
       <div>
         <span className="font-medium">
-          ${row.original.montant.toLocaleString()}
+          {row.original.montant.toLocaleString()} MAD
         </span>
         {row.original.montant_total &&
           row.original.statut_paiement === "Partial" && (
             <div className="text-sm text-gray-500">
-              of ${row.original.montant_total.toLocaleString()}
+              of {row.original.montant_total.toLocaleString()} MAD
             </div>
           )}
       </div>
@@ -51,12 +51,12 @@ const columns: ColumnDef<Payment>[] = [
     cell: ({ row }) => (
       <span
         className={`px-2 py-1 rounded-full text-xs ${
-          row.original.statut_paiement === "PAID"
+          row.original.statut_paiement.toLowerCase() === "paid"
             ? "bg-green-100 text-green-800"
             : "bg-yellow-100 text-yellow-800"
         }`}
       >
-        {row.original.statut_paiement}
+        {row.original.statut_paiement.toLowerCase()}
       </span>
     ),
   },
@@ -81,7 +81,7 @@ const columns: ColumnDef<Payment>[] = [
         >
           <Printer className="w-4 h-4" />
         </button>
-        {row.original.statut_paiement === "PARTIAL" && (
+        {row.original.statut_paiement.toLowerCase() === "partial" && (
           <button
             onClick={() => row.original.onCompletePayment?.(row.original)}
             className="p-1 text-blue-600 hover:text-blue-800"
@@ -246,7 +246,7 @@ function Payments() {
     try {
       setIsLoading(true);
       const response = await fetch(
-        "http://162.19.205.65:81/paiements/?ordering=-date_paiement"
+        "http://167.114.0.177:81/paiements/?ordering=-date_paiement"
       );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -291,7 +291,7 @@ function Payments() {
 
       // Create new payment through API
       const response = await fetch(
-        "http://162.19.205.65:81/paiements/create/",
+        "http://167.114.0.177:81/paiements/create/",
         {
           method: "POST",
           headers: {
@@ -304,7 +304,7 @@ function Payments() {
       if (response.ok) {
         // Fetch updated payments list
         const updatedResponse = await fetch(
-          "http://162.19.205.65:81/paiements/"
+          "http://167.114.0.177:81/paiements/"
         );
         const data = await updatedResponse.json();
 

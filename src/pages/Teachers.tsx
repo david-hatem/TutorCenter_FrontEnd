@@ -49,15 +49,15 @@ function Teachers() {
 
   const columns: ColumnDef<Teacher>[] = [
     {
-      header: "First Name",
+      header: "Prénom",
       accessorKey: "prenom",
     },
     {
-      header: "Last Name",
+      header: "Nom",
       accessorKey: "nom",
     },
     {
-      header: "Specialty",
+      header: "Spécialité",
       accessorKey: "specialite",
       cell: ({ row }) => (
         <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
@@ -66,17 +66,19 @@ function Teachers() {
       ),
     },
     {
-      header: "Birth Date",
+      header: "Date de naissance",
       accessorKey: "date_naissance",
-      cell: ({ row }) =>
-        new Date(row.original.date_naissance).toLocaleDateString(),
+      cell: ({ row }) => {
+        const date = row.original.date_naissance;
+        return date ? new Date(date).toLocaleDateString() : "-";
+      },
     },
     {
-      header: "Phone",
+      header: "Téléphone",
       accessorKey: "telephone",
     },
     {
-      header: "Gender",
+      header: "Genre",
       accessorKey: "sexe",
       cell: ({ row }) => (
         <span
@@ -86,7 +88,7 @@ function Teachers() {
               : "bg-pink-100 text-pink-800"
           }`}
         >
-          {row.original.sexe === "M" ? "Male" : "Female"}
+          {row.original.sexe === "M" ? "Masculin" : "Féminin"}
         </span>
       ),
     },
@@ -113,7 +115,7 @@ function Teachers() {
   ];
 
   useEffect(() => {
-    fetch("http://162.19.205.65:81/professeur_list/")
+    fetch("http://167.114.0.177:81/professeur_list/")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -169,27 +171,29 @@ function Teachers() {
       specialite: "",
     });
 
-    // const handleSubmit = (e: React.FormEvent) => {
-    //   e.preventDefault();
-    //   onSubmit({
-    //     ...formData,
-    //     id: Date.now(),
-    //     created_at: new Date().toISOString(),
-    //   });
-    //   onClose();
-    // };
-
     const handleSubmit = async (e) => {
       e.preventDefault();
-      const createdTch = await createTeacher(formData);
-      setTeachers([...teachers, createdTch]);
+      
+      // Create a copy of the form data
+      const submissionData = { ...formData };
+      
+      // Remove empty optional fields
+      Object.keys(submissionData).forEach(key => {
+        if (submissionData[key] === "" || submissionData[key] === null) {
+          delete submissionData[key];
+        }
+      });
 
-      onSubmit(formData);
-      onClose();
+      const createdTch = await createTeacher(submissionData);
       if (createdTch) {
-        // alert("Teacher created successfully!");
-      } else {
-        // alert("Failed to create group.");
+        // Fetch fresh list of teachers
+        const response = await fetch("http://167.114.0.177:81/professeur_list/");
+        if (response.ok) {
+          const updatedTeachers = await response.json();
+          setTeachers(updatedTeachers);
+        }
+        onSubmit(formData);
+        onClose();
       }
     };
 
@@ -198,7 +202,7 @@ function Teachers() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              First Name
+              Prénom
             </label>
             <input
               type="text"
@@ -212,7 +216,7 @@ function Teachers() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Last Name
+              Nom
             </label>
             <input
               type="text"
@@ -227,7 +231,7 @@ function Teachers() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Specialty
+            Spécialité
           </label>
           <input
             type="text"
@@ -241,25 +245,23 @@ function Teachers() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Birth Date
+            Date de naissance
           </label>
           <input
             type="date"
-            required
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             value={formData.date_naissance}
             onChange={(e) =>
-              setFormData({ ...formData, date_naissance: e.target.value })
+              setFormData({ ...formData, date_naissance: e.target.value || undefined })
             }
           />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Phone
+            Téléphone
           </label>
           <input
             type="tel"
-            required
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             value={formData.telephone}
             onChange={(e) =>
@@ -269,11 +271,10 @@ function Teachers() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Address
+            Adresse
           </label>
           <input
             type="text"
-            required
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             value={formData.adresse}
             onChange={(e) =>
@@ -283,24 +284,23 @@ function Teachers() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Gender
+            Genre
           </label>
           <select
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             value={formData.sexe}
             onChange={(e) => setFormData({ ...formData, sexe: e.target.value })}
           >
-            <option value="M">Male</option>
-            <option value="F">Female</option>
+            <option value="M">Masculin</option>
+            <option value="F">Féminin</option>
           </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Nationality
+            Nationalité
           </label>
           <input
             type="text"
-            required
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             value={formData.nationalite}
             onChange={(e) =>
@@ -314,13 +314,13 @@ function Teachers() {
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
           >
-            Cancel
+            Annuler
           </button>
           <button
             type="submit"
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
-            Add Teacher
+            Ajouter un enseignant
           </button>
         </div>
       </form>
@@ -330,26 +330,26 @@ function Teachers() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Teachers</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Enseignants</h1>
         <button
           onClick={() => setIsModalOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          Add Teacher
+          Ajouter un enseignant
         </button>
       </div>
       <div className="bg-white rounded-lg shadow p-6">
         <DataTable
           columns={columns}
           data={teachersWithActions}
-          searchPlaceholder="Search teachers..."
+          searchPlaceholder="Rechercher un enseignant..."
         />
       </div>
 
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Add New Teacher"
+        title="Ajouter un enseignant"
       >
         <TeacherForm
           onSubmit={handleAddTeacher}
@@ -362,7 +362,7 @@ function Teachers() {
         onConfirm={async () => {
           try {
             await axios.delete(
-              `http://162.19.205.65:81/professeurs/delete/${teacherToDelete}/`,
+              `http://167.114.0.177:81/professeurs/delete/${teacherToDelete}/`,
               {
                 headers: {
                   "Content-Type": "application/json",
@@ -376,7 +376,7 @@ function Teachers() {
             setTeacherToDelete(null);
             // Show success message
             // alert("Teacher deleted successfully");
-            toast.error("Deleted Successfully", {
+            toast.error("Supprimé avec succès", {
               position: "top-center",
               autoClose: 5000,
               hideProgressBar: false,
@@ -393,7 +393,7 @@ function Teachers() {
           }
         }}
         onCancel={() => setTeacherToDelete(null)}
-        message="Do you really want to delete this teacher?"
+        message="Voulez-vous vraiment supprimer cet enseignant ?"
       />
     </div>
   );

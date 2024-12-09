@@ -74,7 +74,7 @@ function StudentDetails() {
 
     try {
       const response = await fetch(
-        `http://162.19.205.65:81/etudiants/${id}/details/`
+        `http://167.114.0.177:81/etudiants/${id}/details/`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch student details");
@@ -433,7 +433,7 @@ function StudentDetails() {
       if (response) {
         // Fetch fresh student data after update
         const updatedResponse = await fetch(
-          `http://162.19.205.65:81/etudiants/${id}/details/`
+          `http://167.114.0.177:81/etudiants/${id}/details/`
         );
         if (!updatedResponse.ok) {
           throw new Error("Failed to fetch updated student details");
@@ -531,7 +531,7 @@ function StudentDetails() {
             <div>
               <label className="text-sm text-gray-500">Birth Date</label>
               <p className="font-medium">
-                {new Date(student.date_naissance).toLocaleDateString()}
+                {student.date_naissance ? new Date(student.date_naissance).toLocaleDateString() : "-"}
               </p>
             </div>
             <div>

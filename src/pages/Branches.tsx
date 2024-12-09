@@ -77,7 +77,7 @@ function BranchDetails({
     <div className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700">
-          Branch Name
+          Nom de la filiale
         </label>
         <p className="mt-1 text-sm text-gray-900">{branch.nom_filiere}</p>
       </div>
@@ -89,7 +89,7 @@ function BranchDetails({
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700">
-          Created At
+          Date de création
         </label>
         <p className="mt-1 text-sm text-gray-900">
           {new Date(branch.created_at).toLocaleDateString()}
@@ -100,7 +100,7 @@ function BranchDetails({
           onClick={onClose}
           className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
         >
-          Close
+          Fermer
         </button>
       </div>
     </div>
@@ -120,7 +120,7 @@ function Branches() {
 
   const columns: ColumnDef<Branch>[] = [
     {
-      header: "Branch Name",
+      header: "Nom de la filiale",
       accessorKey: "nom_filiere",
       cell: ({ row }) => (
         <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
@@ -133,7 +133,7 @@ function Branches() {
       accessorKey: "description",
     },
     {
-      header: "Created At",
+      header: "Date de création",
       accessorKey: "created_at",
       cell: ({ row }) => new Date(row.original.created_at).toLocaleDateString(),
     },
@@ -166,7 +166,7 @@ function Branches() {
   ];
 
   useEffect(() => {
-    fetch("http://162.19.205.65:81/filiere_list/")
+    fetch("http://167.114.0.177:81/filiere_list/")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -263,12 +263,12 @@ function Branches() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Branch Name
+            Nom de la filiale
           </label>
           <input
             type="text"
             required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             value={formData.nom_filiere}
             onChange={(e) =>
               setFormData({ ...formData, nom_filiere: e.target.value })
@@ -295,13 +295,13 @@ function Branches() {
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
           >
-            Cancel
+            Annuler
           </button>
           <button
             type="submit"
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
-            {initialData ? "Update Branch" : "Add Branch"}
+            {initialData ? "Mettre à jour la filiale" : "Ajouter une filiale"}
           </button>
         </div>
       </form>
@@ -311,19 +311,19 @@ function Branches() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Branches</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Filiales</h1>
         <button
           onClick={() => setIsAddModalOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          Add Branch
+          Ajouter une filiale
         </button>
       </div>
       <div className="bg-white rounded-lg shadow p-6">
         <DataTable
           columns={columns}
           data={branchesWithActions}
-          searchPlaceholder="Search branches..."
+          searchPlaceholder="Rechercher les filiales..."
         />
       </div>
 
@@ -331,7 +331,7 @@ function Branches() {
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title="Add New Branch"
+        title="Ajouter une filiale"
       >
         <BranchForm
           onSubmit={handleAddBranch}
@@ -346,7 +346,7 @@ function Branches() {
           setIsEditModalOpen(false);
           setSelectedBranch(null);
         }}
-        title="Edit Branch"
+        title="Mettre à jour la filiale"
       >
         {selectedBranch && (
           <BranchForm
@@ -367,7 +367,7 @@ function Branches() {
           setIsViewModalOpen(false);
           setSelectedBranch(null);
         }}
-        title="Branch Details"
+        title="Détails de la filiale"
       >
         {selectedBranch && (
           <BranchDetails
@@ -385,7 +385,7 @@ function Branches() {
         onConfirm={async () => {
           try {
             await axios.delete(
-              `http://162.19.205.65:81/filieres/delete/${branchToDelete}/`,
+              `http://167.114.0.177:81/filieres/delete/${branchToDelete}/`,
               {
                 headers: {
                   "Content-Type": "application/json",
@@ -399,7 +399,7 @@ function Branches() {
             setBranchToDelete(null);
             // Show success message
             // alert("Branch deleted successfully");
-            toast.error("Deleted Successfully", {
+            toast.error("Supprimé avec succès", {
               position: "top-center",
               autoClose: 5000,
               hideProgressBar: false,
@@ -416,7 +416,7 @@ function Branches() {
           }
         }}
         onCancel={() => setBranchToDelete(null)}
-        message="Do you really want to delete this branch?"
+        message="Êtes-vous sûr de vouloir supprimer cette filiale ?"
       />
     </div>
   );

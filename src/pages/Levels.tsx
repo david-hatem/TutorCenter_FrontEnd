@@ -77,7 +77,7 @@ function LevelDetails({
     <div className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700">
-          Level Name
+          Nom du niveau
         </label>
         <p className="mt-1 text-sm text-gray-900">{level.nom_niveau}</p>
       </div>
@@ -89,7 +89,7 @@ function LevelDetails({
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700">
-          Created At
+          Date de création
         </label>
         <p className="mt-1 text-sm text-gray-900">
           {new Date(level.created_at).toLocaleDateString()}
@@ -100,7 +100,7 @@ function LevelDetails({
           onClick={onClose}
           className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
         >
-          Close
+          Fermer
         </button>
       </div>
     </div>
@@ -124,7 +124,7 @@ function Levels() {
       accessorKey: "id",
     },
     {
-      header: "Level Name",
+      header: "Nom du niveau",
       accessorKey: "nom_niveau",
       cell: ({ row }) => (
         <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
@@ -137,7 +137,7 @@ function Levels() {
       accessorKey: "description",
     },
     {
-      header: "Created At",
+      header: "Date de création",
       accessorKey: "created_at",
       cell: ({ row }) => new Date(row.original.created_at).toLocaleDateString(),
     },
@@ -170,7 +170,7 @@ function Levels() {
   ];
 
   useEffect(() => {
-    fetch("http://162.19.205.65:81/niveau_list/")
+    fetch("http://167.114.0.177:81/niveau_list/")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -267,12 +267,12 @@ function Levels() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Level Name
+            Nom du niveau
           </label>
           <input
             type="text"
             required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             value={formData.nom_niveau}
             onChange={(e) =>
               setFormData({ ...formData, nom_niveau: e.target.value })
@@ -286,7 +286,7 @@ function Levels() {
           <textarea
             required
             rows={3}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             value={formData.description}
             onChange={(e) =>
               setFormData({ ...formData, description: e.target.value })
@@ -299,13 +299,13 @@ function Levels() {
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
           >
-            Cancel
+            Annuler
           </button>
           <button
             type="submit"
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
-            {initialData ? "Update Level" : "Add Level"}
+            {initialData ? "Mettre à jour le niveau" : "Ajouter un niveau"}
           </button>
         </div>
       </form>
@@ -315,19 +315,19 @@ function Levels() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Levels</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Niveaux</h1>
         <button
           onClick={() => setIsAddModalOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          Add Level
+          Ajouter un niveau
         </button>
       </div>
       <div className="bg-white rounded-lg shadow p-6">
         <DataTable
           columns={columns}
           data={levelsWithActions}
-          searchPlaceholder="Search levels..."
+          searchPlaceholder="Rechercher des niveaux..."
         />
       </div>
 
@@ -335,7 +335,7 @@ function Levels() {
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title="Add New Level"
+        title="Ajouter un niveau"
       >
         <LevelForm
           onSubmit={handleAddLevel}
@@ -350,7 +350,7 @@ function Levels() {
           setIsEditModalOpen(false);
           setSelectedLevel(null);
         }}
-        title="Edit Level"
+        title="Mettre à jour le niveau"
       >
         {selectedLevel && (
           <LevelForm
@@ -371,7 +371,7 @@ function Levels() {
           setIsViewModalOpen(false);
           setSelectedLevel(null);
         }}
-        title="Level Details"
+        title="Détails du niveau"
       >
         {selectedLevel && (
           <LevelDetails
@@ -389,7 +389,7 @@ function Levels() {
         onConfirm={async () => {
           try {
             await axios.delete(
-              `http://162.19.205.65:81/niveaux/delete/${levelToDelete}/`,
+              `http://167.114.0.177:81/niveaux/delete/${levelToDelete}/`,
               {
                 headers: {
                   "Content-Type": "application/json",
@@ -400,7 +400,7 @@ function Levels() {
             setLevels(levels.filter((level) => level.id !== levelToDelete));
             setLevelToDelete(null);
             // Show success message
-            toast.error("Deleted Successfully", {
+            toast.error("Supprimé avec succès", {
               position: "top-center",
               autoClose: 5000,
               hideProgressBar: false,
@@ -415,7 +415,7 @@ function Levels() {
           } catch (error) {
             console.error("Error deleting level:", error);
             // alert("Failed to delete level");
-            toast.error("Failed to Delete", {
+            toast.error("Échec de la suppression", {
               position: "top-center",
               autoClose: 5000,
               hideProgressBar: false,
@@ -429,7 +429,7 @@ function Levels() {
           }
         }}
         onCancel={() => setLevelToDelete(null)}
-        message="Do you really want to delete this level?"
+        message="Êtes-vous sûr de vouloir supprimer ce niveau ? Cette action ne peut pas être annulée."
       />
     </div>
   );

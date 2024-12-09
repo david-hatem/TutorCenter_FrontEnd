@@ -176,7 +176,7 @@ function Subjects() {
             isOpen={subToDelete !== null}
             onConfirm={async () => {
               await axios.delete(
-                `http://162.19.205.65:81/matieres/delete/${subToDelete}/`,
+                `http://167.114.0.177:81/matieres/delete/${subToDelete}/`,
                 {
                   headers: {
                     "Content-Type": "application/json", // Define content type as JSON
@@ -207,7 +207,7 @@ function Subjects() {
 
   useEffect(() => {
     // Fetch data from the API
-    fetch("http://162.19.205.65:81/matiere_list/")
+    fetch("http://167.114.0.177:81/matiere_list/")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

@@ -107,7 +107,7 @@ function Expenses() {
     // Fetch data from the API
     const fetchData = async () => {
       try {
-        const response = await fetch("http://162.19.205.65:81/depenses/");
+        const response = await fetch("http://167.114.0.177:81/depenses/");
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -318,7 +318,7 @@ function Expenses() {
         onConfirm={async () => {
           try {
             await axios.delete(
-              `http://162.19.205.65:81/depenses/${branchToDelete}/`,
+              `http://167.114.0.177:81/depenses/${branchToDelete}/`,
               {
                 headers: {
                   "Content-Type": "application/json",

@@ -47,7 +47,7 @@ function Dashboard() {
     const fetchMetrics = async () => {
       try {
         const response = await fetch(
-          "http://162.19.205.65:81/dashboard/metrics/"
+          "http://167.114.0.177:81/dashboard/metrics/"
         );
         if (!response.ok) {
           throw new Error(`Error fetching metrics: ${response.status}`);
@@ -61,7 +61,7 @@ function Dashboard() {
     const fetchMonthFinance = async () => {
       try {
         const response = await fetch(
-          "http://162.19.205.65:81/dashboard/financial-metrics/"
+          "http://167.114.0.177:81/dashboard/financial-metrics/"
         );
         if (!response.ok) {
           throw new Error(`Error fetching metrics: ${response.status}`);
@@ -76,7 +76,7 @@ function Dashboard() {
     const fetchWeekFinance = async () => {
       try {
         const response = await fetch(
-          "http://162.19.205.65:81/dashboard/weekly-financial-metrics/"
+          "http://167.114.0.177:81/dashboard/weekly-financial-metrics/"
         );
         if (!response.ok) {
           throw new Error(`Error fetching metrics: ${response.status}`);
@@ -96,43 +96,43 @@ function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
+      <h1 className="text-2xl font-bold text-gray-900">Tableau de bord</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
-          title="Total Students"
+          title="Nombre d'étudiants"
           value={metrics?.student_metrics?.total_students}
           icon={Users}
           trend={12}
-          trendLabel="vs last month"
+          trendLabel="vs mois dernier"
         />
         <StatsCard
-          title="Total Teachers"
+          title="Nombre d'enseignants"
           value={metrics?.teacher_metrics?.total_teachers}
           icon={GraduationCap}
           trend={8}
-          trendLabel="vs last month"
+          trendLabel="vs mois dernier"
         />
         <StatsCard
-          title="Total Payments"
+          title="Total des paiements"
           value={metrics?.payment_metrics?.total_amount}
           icon={Wallet}
           trend={24}
-          trendLabel="vs last month"
+          trendLabel="vs mois dernier"
         />
         <StatsCard
-          title="Total Commissions"
+          title="Total des commissions"
           value={metrics?.commission_metrics?.total_commission_amount}
           icon={PiggyBank}
           trend={18}
-          trendLabel="vs last month"
+          trendLabel="vs mois dernier"
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-lg font-semibold mb-4">
-            Monthly Revenue Overview
+            Aperçu des revenus mensuels
           </h2>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -145,19 +145,19 @@ function Dashboard() {
                   type="monotone"
                   dataKey="depenses"
                   stroke="#3B82F6"
-                  name="Depenses"
+                  name="Expenses"
                 />
                 <Line
                   type="monotone"
                   dataKey="sorties-banque"
                   stroke="#10B981"
-                  name="Sorties Banque"
+                  name="Bank Withdrawals"
                 />
                 <Line
                   type="monotone"
                   dataKey="recettes"
                   stroke="#EF4444"
-                  name="Recettes"
+                  name="Revenue"
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -166,7 +166,7 @@ function Dashboard() {
 
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-lg font-semibold mb-4">
-            Expenses & Bank Withdrawals
+            Dépenses et retraits bancaires
           </h2>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -175,7 +175,7 @@ function Dashboard() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="paiements" fill="#EF4444" name="Paiements" />
+                <Bar dataKey="paiements" fill="#EF4444" name="Payments" />
                 <Bar dataKey="commissions" fill="#8B5CF6" name="Commissions" />
               </BarChart>
             </ResponsiveContainer>

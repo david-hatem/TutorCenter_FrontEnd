@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Bounce, toast } from "react-toastify";
 
-const API_BASE_URL = "http://162.19.205.65:81";
+const API_BASE_URL = "http://167.114.0.177:81";
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -69,7 +69,7 @@ export const teachersApi = {
 
 export const fetchGroupeList = async () => {
   try {
-    const response = await axios.get("http://162.19.205.65:81/groupe_list/");
+    const response = await axios.get("http://167.114.0.177:81/groupe_list/");
     if (response.status === 200) {
       return response.data;
     } else {
@@ -84,7 +84,7 @@ export const fetchGroupeList = async () => {
 
 export const fetchFiliereList = async () => {
   try {
-    const response = await axios.get("http://162.19.205.65:81/filiere_list/");
+    const response = await axios.get("http://167.114.0.177:81/filiere_list/");
     if (response.status === 200) {
       return response.data;
     } else {
@@ -99,7 +99,7 @@ export const fetchFiliereList = async () => {
 
 export const fetchNiveauList = async () => {
   try {
-    const response = await axios.get("http://162.19.205.65:81/niveau_list/");
+    const response = await axios.get("http://167.114.0.177:81/niveau_list/");
     if (response.status === 200) {
       return response.data;
     } else {
@@ -114,7 +114,7 @@ export const fetchNiveauList = async () => {
 
 export const fetchMatiereList = async () => {
   try {
-    const response = await axios.get("http://162.19.205.65:81/matiere_list/");
+    const response = await axios.get("http://167.114.0.177:81/matiere_list/");
     if (response.status === 200) {
       return response.data;
     } else {
@@ -130,7 +130,7 @@ export const fetchMatiereList = async () => {
 export const fetchTeachersList = async () => {
   try {
     const response = await axios.get(
-      "http://162.19.205.65:81/professeur_list/"
+      "http://167.114.0.177:81/professeur_list/"
     );
     if (response.status === 200) {
       return response.data;
@@ -147,7 +147,7 @@ export const fetchTeachersList = async () => {
 export const createGroup = async (groupData) => {
   try {
     const response = await axios.post(
-      "http://162.19.205.65:81/groupes/create/",
+      "http://167.114.0.177:81/groupes/create/",
       groupData,
       {
         headers: {
@@ -193,7 +193,7 @@ export const createGroup = async (groupData) => {
 export const updateGroup = async (groupData, id) => {
   try {
     const response = await axios.put(
-      `http://162.19.205.65:81/groupes/update/${id}`,
+      `http://167.114.0.177:81/groupes/update/${id}`,
       groupData,
       {
         headers: {
@@ -239,7 +239,7 @@ export const updateGroup = async (groupData, id) => {
 export const createStudent = async (groupData) => {
   try {
     const response = await axios.post(
-      "http://162.19.205.65:81/etudiants/create/",
+      "http://167.114.0.177:81/etudiants/create/",
       groupData,
       {
         headers: {
@@ -285,7 +285,7 @@ export const createStudent = async (groupData) => {
 export const updateStudent = async (groupData, id) => {
   try {
     const response = await axios.put(
-      `http://162.19.205.65:81/etudiants/update/${id}`,
+      `http://167.114.0.177:81/etudiants/update/${id}`,
       groupData,
       {
         headers: {
@@ -331,7 +331,7 @@ export const updateStudent = async (groupData, id) => {
 export const addStudentGrp = async (groupData) => {
   try {
     const response = await axios.post(
-      `http://162.19.205.65:81/etudiants/add-to-group/`,
+      `http://167.114.0.177:81/etudiants/add-to-group/`,
       groupData,
       {
         headers: {
@@ -388,7 +388,7 @@ export const addStudentGrp = async (groupData) => {
 export const createTeacher = async (groupData) => {
   try {
     const response = await axios.post(
-      "http://162.19.205.65:81/professeurs/create/",
+      "http://167.114.0.177:81/professeurs/create/",
       groupData,
       {
         headers: {
@@ -434,7 +434,7 @@ export const createTeacher = async (groupData) => {
 export const updateTeacher = async (groupData, id) => {
   try {
     const response = await axios.put(
-      `http://162.19.205.65:81/professeurs/update/${id}`,
+      `http://167.114.0.177:81/professeurs/update/${id}`,
       groupData,
       {
         headers: {
@@ -480,7 +480,7 @@ export const updateTeacher = async (groupData, id) => {
 export const createPayment = async (payData) => {
   try {
     const response = await axios.post(
-      "http://162.19.205.65:81/payments/create/",
+      "http://167.114.0.177:81/payments/create/",
       payData,
       {
         headers: {
@@ -526,7 +526,7 @@ export const createPayment = async (payData) => {
 export const updatePayment = async (payData, id) => {
   try {
     const response = await axios.put(
-      `http://162.19.205.65:81/payments/${id}/update/`,
+      `http://167.114.0.177:81/payments/${id}/update/`,
       payData,
       {
         headers: {
@@ -572,7 +572,7 @@ export const updatePayment = async (payData, id) => {
 export const createLevel = async (levData) => {
   try {
     const response = await axios.post(
-      "http://162.19.205.65:81/niveaux/create/",
+      "http://167.114.0.177:81/niveaux/create/",
       levData,
       {
         headers: {
@@ -617,7 +617,7 @@ export const createLevel = async (levData) => {
 export const updateLevel = async (levData, id) => {
   try {
     const response = await axios.put(
-      `http://162.19.205.65:81/niveaux/update/${id}`,
+      `http://167.114.0.177:81/niveaux/update/${id}`,
       levData,
       {
         headers: {
@@ -660,7 +660,7 @@ export const updateLevel = async (levData, id) => {
 export const createBranch = async (branchData) => {
   try {
     const response = await axios.post(
-      "http://162.19.205.65:81/filieres/create/",
+      "http://167.114.0.177:81/filieres/create/",
       branchData,
       {
         headers: {
@@ -706,7 +706,7 @@ export const createBranch = async (branchData) => {
 export const updateBranch = async (branchData, id) => {
   try {
     const response = await axios.put(
-      `http://162.19.205.65:81/filieres/update/${id}`,
+      `http://167.114.0.177:81/filieres/update/${id}`,
       branchData,
       {
         headers: {
@@ -752,7 +752,7 @@ export const updateBranch = async (branchData, id) => {
 export const createSub = async (subData) => {
   try {
     const response = await axios.post(
-      "http://162.19.205.65:81/matieres/create/",
+      "http://167.114.0.177:81/matieres/create/",
       subData,
       {
         headers: {
@@ -798,7 +798,7 @@ export const createSub = async (subData) => {
 export const updateSub = async (subData, id) => {
   try {
     const response = await axios.put(
-      `http://162.19.205.65:81/matieres/update/${id}`,
+      `http://167.114.0.177:81/matieres/update/${id}`,
       subData,
       {
         headers: {
@@ -844,7 +844,7 @@ export const updateSub = async (subData, id) => {
 export const createDepenses = async (subData) => {
   try {
     const response = await axios.post(
-      "http://162.19.205.65:81/depenses/",
+      "http://167.114.0.177:81/depenses/",
       subData,
       {
         headers: {
@@ -890,7 +890,7 @@ export const createDepenses = async (subData) => {
 export const updateDepenses = async (subData, id) => {
   try {
     const response = await axios.put(
-      `http://162.19.205.65:81/depenses/${id}`,
+      `http://167.114.0.177:81/depenses/${id}`,
       subData,
       {
         headers: {
@@ -935,7 +935,7 @@ export const updateDepenses = async (subData, id) => {
 export const createSortiesBanque = async (subData) => {
   try {
     const response = await axios.post(
-      "http://162.19.205.65:81/sorties-banque/",
+      "http://167.114.0.177:81/sorties-banque/",
       subData,
       {
         headers: {
@@ -981,7 +981,7 @@ export const createSortiesBanque = async (subData) => {
 export const updateSortiesBanque = async (subData, id) => {
   try {
     const response = await axios.put(
-      `http://162.19.205.65:81/sorties-banque/${id}`,
+      `http://167.114.0.177:81/sorties-banque/${id}`,
       subData,
       {
         headers: {
