@@ -25,7 +25,11 @@ function Header() {
 
   return (
     <header className="bg-white border-b border-gray-200 h-16">
-      <div className="h-full px-6 flex items-center justify-end">
+      <div className="h-full px-6 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <img src="/src/assets/logo.svg" alt="Delta Institut Logo" className="w-8 h-8" />
+          <h1 className="text-xl font-bold text-gray-800">Delta Institut</h1>
+        </div>
         <div className="relative">
           <button
             onClick={() => setIsProfileOpen(!isProfileOpen)}
