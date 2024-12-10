@@ -62,77 +62,6 @@ function TeacherDetails() {
   const [error, setError] = React.useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // React.useEffect(() => {
-  //   // Simulating API call
-  //   setTimeout(() => {
-  //     setTeacher({
-  //       id: 1,
-  //       nom: "Amrani",
-  //       prenom: "Youssef",
-  //       telephone: "+2126778901230",
-  //       adresse: "789 Avenue Hassan II, Marrakech",
-  //       date_naissance: "1985-03-12",
-  //       sexe: "M",
-  //       nationalite: "Marocain",
-  //       specialite: "Mathematique",
-  //       created_at: "2024-10-25T19:14:26.785819Z",
-  //       groupes: [
-  //         {
-  //           id: 38,
-  //           nom_groupe: "ttttttt",
-  //           commission_fixe: 100.0,
-  //           filiere: {
-  //             id: 3,
-  //             nom_filiere: "Sciences Experimentales",
-  //           },
-  //           niveau: {
-  //             id: 2,
-  //             nom_niveau: "1BAC",
-  //           },
-  //           max_etudiants: 30,
-  //           matieres: [
-  //             {
-  //               id: 2,
-  //               nom_matiere: "Physiques",
-  //             },
-  //             {
-  //               id: 1,
-  //               nom_matiere: "Mathematique",
-  //             },
-  //             {
-  //               id: 3,
-  //               nom_matiere: "SVT",
-  //             },
-  //           ],
-  //           etudiants: [],
-  //           total_etudiants: 0,
-  //         },
-  //       ],
-  //       commissions: [
-  //         {
-  //           id: 1,
-  //           montant: 120.0,
-  //           date_comission: "2024-06-15T00:00:00Z",
-  //           statut_comission: "Paid",
-  //           etudiant: {
-  //             id: 1,
-  //             nom: "Doe",
-  //             prenom: "Odim1",
-  //           },
-  //           groupe: {
-  //             id: 1,
-  //             nom_groupe: "Pack Math et PC",
-  //           },
-  //         },
-  //         // ... more commissions
-  //       ],
-  //       total_commissions: 2870.0,
-  //       total_groupes: 5,
-  //     });
-  //     setIsLoading(false);
-  //   }, 1000);
-  // }, [id]);
-
   useEffect(() => {
     const fetchProfesseursDetails = async () => {
       setIsLoading(true);
@@ -164,12 +93,12 @@ function TeacherDetails() {
   if (!teacher) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">Teacher not found</p>
+        <p className="text-gray-500">Professeur non trouvé</p>
         <Link
           to="/teachers"
           className="text-blue-600 hover:underline mt-4 inline-block"
         >
-          Back to Teachers
+          Retour aux professeurs
         </Link>
       </div>
     );
@@ -193,26 +122,11 @@ function TeacherDetails() {
       specialite: teacher?.specialite,
     });
 
-    // const handleSubmit = (e: React.FormEvent) => {
-    //   e.preventDefault();
-    //   onSubmit({
-    //     ...formData,
-    //     id: Date.now(),
-    //     created_at: new Date().toISOString(),
-    //   });
-    //   onClose();
-    // };
-
     const handleSubmit = async (e) => {
       e.preventDefault();
       const createdTch = await updateTeacher(formData, id);
       onSubmit(formData);
       onClose();
-      // if (createdTch) {
-      //   alert("Teacher created successfully!");
-      // } else {
-      //   alert("Failed to create group.");
-      // }
     };
 
     return (
@@ -220,7 +134,7 @@ function TeacherDetails() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              First Name
+              Prénom
             </label>
             <input
               type="text"
@@ -234,7 +148,7 @@ function TeacherDetails() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Last Name
+              Nom
             </label>
             <input
               type="text"
@@ -249,7 +163,7 @@ function TeacherDetails() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Specialty
+            Spécialité
           </label>
           <input
             type="text"
@@ -263,7 +177,7 @@ function TeacherDetails() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Birth Date
+            Date de naissance
           </label>
           <input
             type="date"
@@ -277,7 +191,7 @@ function TeacherDetails() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Phone
+            Téléphone
           </label>
           <input
             type="tel"
@@ -291,7 +205,7 @@ function TeacherDetails() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Address
+            Adresse
           </label>
           <input
             type="text"
@@ -305,20 +219,20 @@ function TeacherDetails() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Gender
+            Sexe
           </label>
           <select
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             value={formData.sexe}
             onChange={(e) => setFormData({ ...formData, sexe: e.target.value })}
           >
-            <option value="M">Male</option>
-            <option value="F">Female</option>
+            <option value="M">Masculin</option>
+            <option value="F">Féminin</option>
           </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Nationality
+            Nationalité
           </label>
           <input
             type="text"
@@ -336,13 +250,13 @@ function TeacherDetails() {
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
           >
-            Cancel
+            Annuler
           </button>
           <button
             type="submit"
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
-            Update Teacher
+            Mettre à jour le professeur
           </button>
         </div>
       </form>
@@ -355,70 +269,70 @@ function TeacherDetails() {
         <div className="flex items-center space-x-4">
           <Link
             to="/teachers"
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="text-gray-500 hover:text-gray-700"
           >
             <ArrowLeft className="w-6 h-6" />
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Teacher Details</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Détails du professeur</h1>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          Edit Teacher
+          Éditer le professeur
         </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Personal Information */}
+        {/* Informations personnelles */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">Personal Information</h2>
+          <h2 className="text-lg font-semibold mb-4">Informations personnelles</h2>
           <div className="space-y-4">
             <div>
-              <label className="text-sm text-gray-500">Full Name</label>
+              <label className="text-sm text-gray-500">Nom complet</label>
               <p className="font-medium">
                 {teacher.prenom} {teacher.nom}
               </p>
             </div>
             <div>
-              <label className="text-sm text-gray-500">Specialty</label>
+              <label className="text-sm text-gray-500">Spécialité</label>
               <p className="font-medium">{teacher.specialite}</p>
             </div>
             <div>
-              <label className="text-sm text-gray-500">Birth Date</label>
+              <label className="text-sm text-gray-500">Date de naissance</label>
               <p className="font-medium">
                 {new Date(teacher.date_naissance).toLocaleDateString()}
               </p>
             </div>
             <div>
-              <label className="text-sm text-gray-500">Phone</label>
+              <label className="text-sm text-gray-500">Téléphone</label>
               <p className="font-medium">{teacher.telephone}</p>
             </div>
             <div>
-              <label className="text-sm text-gray-500">Address</label>
+              <label className="text-sm text-gray-500">Adresse</label>
               <p className="font-medium">{teacher.adresse}</p>
             </div>
             <div>
-              <label className="text-sm text-gray-500">Gender</label>
+              <label className="text-sm text-gray-500">Sexe</label>
               <p className="font-medium">
-                {teacher.sexe === "M" ? "Male" : "Female"}
+                {teacher.sexe === "M" ? "Masculin" : "Féminin"}
               </p>
             </div>
             <div>
-              <label className="text-sm text-gray-500">Nationality</label>
+              <label className="text-sm text-gray-500">Nationalité</label>
               <p className="font-medium">{teacher.nationalite}</p>
             </div>
           </div>
         </div>
 
-        {/* Groups */}
+        {/* Groupes */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Groups</h2>
+            <h2 className="text-lg font-semibold">Groupes</h2>
             <div className="flex items-center space-x-2">
               <Users className="w-5 h-5 text-blue-600" />
               <span className="text-sm font-medium">
-                {teacher.total_groupes} group(s)
+                {teacher.total_groupes} groupe(s)
               </span>
             </div>
           </div>
@@ -428,24 +342,24 @@ function TeacherDetails() {
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-medium text-lg">{group.nom_groupe}</h3>
                   <span className="text-sm text-green-600 font-medium">
-                    ${group.commission_fixe}/student
+                    {group.commission_fixe} MAD/étudiant
                   </span>
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-500">Level:</span>
+                    <span className="text-sm text-gray-500">Niveau:</span>
                     <span className="text-sm font-medium">
                       {group.niveau.nom_niveau}
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-500">Branch:</span>
+                    <span className="text-sm text-gray-500">Filière:</span>
                     <span className="text-sm font-medium">
                       {group.filiere.nom_filiere}
                     </span>
                   </div>
                   <div>
-                    <span className="text-sm text-gray-500">Subjects:</span>
+                    <span className="text-sm text-gray-500">Matières:</span>
                     <div className="flex flex-wrap gap-2 mt-1">
                       {group.matieres.map((matiere) => (
                         <span
@@ -458,7 +372,7 @@ function TeacherDetails() {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-500">Students:</span>
+                    <span className="text-sm text-gray-500">Étudiants:</span>
                     <span className="text-sm font-medium">
                       {group.total_etudiants} / {group.max_etudiants}
                     </span>
@@ -476,7 +390,7 @@ function TeacherDetails() {
             <div className="flex items-center space-x-2">
               <PiggyBank className="w-5 h-5 text-green-600" />
               <span className="text-sm font-medium">
-                ${teacher.total_commissions.toLocaleString()}
+                {teacher.total_commissions.toLocaleString()} MAD
               </span>
             </div>
           </div>
@@ -488,7 +402,7 @@ function TeacherDetails() {
               >
                 <div>
                   <p className="font-medium">
-                    ${commission.montant.toLocaleString()}
+                    {commission.montant.toLocaleString()} MAD
                   </p>
                   <p className="text-sm text-gray-500">
                     {commission.etudiant.prenom} {commission.etudiant.nom}
@@ -499,13 +413,9 @@ function TeacherDetails() {
                 </div>
                 <div className="text-right">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs ${
-                      commission.statut_comission === "paid"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
+                    className={`px-2 py-1 rounded-full text-xs bg-green-100 text-green-800`}
                   >
-                    {commission.statut_comission}
+                    {commission.statut_comission.toLowerCase()}
                   </span>
                   <p className="text-sm text-gray-500 mt-1">
                     {new Date(commission.date_comission).toLocaleDateString()}
@@ -520,7 +430,7 @@ function TeacherDetails() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Edit Student"
+        title="Éditer le professeur"
       >
         <EditTeacherForm
           onSubmit={() => {}}

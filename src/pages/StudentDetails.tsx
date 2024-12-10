@@ -119,68 +119,6 @@ function StudentDetails() {
     );
   };
 
-  // useEffect(() => {
-  //   // Simulating API call
-  //   setTimeout(() => {
-  //     setStudent({
-  //       id: 1,
-  //       nom: "Doe",
-  //       prenom: "John",
-  //       date_naissance: "2003-01-01",
-  //       telephone: "123456789011111",
-  //       adresse: "123 Main St",
-  //       sexe: "M",
-  //       nationalite: "French",
-  //       contact_urgence: "98765432101111111",
-  //       created_at: "2024-10-25T19:14:26.603176Z",
-  //       groupes: [
-  //         {
-  //           id: 1,
-  //           nom_groupe: "Pack Math et PC",
-  //           niveau: {
-  //             id: 1,
-  //             nom_niveau: "2BAC",
-  //           },
-  //           filiere: {
-  //             id: 1,
-  //             nom_filiere: "Sciences Mathematiques",
-  //           },
-  //           matieres: [
-  //             {
-  //               id: 1,
-  //               nom_matiere: "Mathematique",
-  //             },
-  //             {
-  //               id: 2,
-  //               nom_matiere: "Physiques",
-  //             },
-  //           ],
-  //           professeurs: [
-  //             {
-  //               id: 1,
-  //               nom: "Amrani",
-  //               prenom: "Youssef",
-  //               commission_fixe: 150.0,
-  //             },
-  //           ],
-  //         },
-  //       ],
-  //       paiements: [
-  //         {
-  //           id: 1,
-  //           montant: 1000.0,
-  //           date_paiement: "2024-06-15T00:00:00Z",
-  //           statut_paiement: "Paid",
-  //           groupe: "Pack Math et PC",
-  //         },
-  //       ],
-  //       total_paiements: 1000.0,
-  //       total_groupes: 1,
-  //     });
-  //     setIsLoading(false);
-  //   }, 1000);
-  // }, [id]);
-
   interface StudentFormData {
     prenom: string;
     nom: string;
@@ -214,12 +152,6 @@ function StudentDetails() {
 
     const [groups, setGroups] = useState([]);
 
-    // const handleSubmit = (e: React.FormEvent) => {
-    //   e.preventDefault();
-    //   onSubmit(formData);
-    //   onClose();
-    // };
-
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       const createdStd = await updateStudent(formData, id);
@@ -245,7 +177,7 @@ function StudentDetails() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              First Name
+              Prénom
             </label>
             <input
               type="text"
@@ -259,7 +191,7 @@ function StudentDetails() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Last Name
+              Nom
             </label>
             <input
               type="text"
@@ -274,7 +206,7 @@ function StudentDetails() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Birth Date
+            Date de naissance
           </label>
           <input
             type="date"
@@ -288,7 +220,7 @@ function StudentDetails() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Phone
+            Téléphone
           </label>
           <input
             type="tel"
@@ -302,7 +234,7 @@ function StudentDetails() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Address
+            Adresse
           </label>
           <input
             type="text"
@@ -316,20 +248,20 @@ function StudentDetails() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Gender
+            Sexe
           </label>
           <select
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             defaultValue={formData?.sexe}
             onChange={(e) => setFormData({ ...formData, sexe: e.target.value })}
           >
-            <option value="M">Male</option>
-            <option value="F">Female</option>
+            <option value="M">Masculin</option>
+            <option value="F">Féminin</option>
           </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Nationality
+            Nationalité
           </label>
           <input
             type="text"
@@ -343,7 +275,7 @@ function StudentDetails() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Emergency Contact
+            Contact d'urgence
           </label>
           <input
             type="tel"
@@ -357,7 +289,7 @@ function StudentDetails() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Group
+            Groupe
           </label>
           <select
             required
@@ -367,7 +299,7 @@ function StudentDetails() {
               setFormData({ ...formData, groupe_id: parseInt(e.target.value) })
             }
           >
-            <option value="">Select a group</option>
+            <option value="">Sélectionner un groupe</option>
             {groups.map((group) => (
               <option key={group.id} value={group.id}>
                 {group.nom_groupe} - {group.niveau.nom_niveau} (
@@ -382,13 +314,13 @@ function StudentDetails() {
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
           >
-            Cancel
+            Annuler
           </button>
           <button
             type="submit"
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
-            Update Student
+            Mettre à jour l'étudiant
           </button>
         </div>
       </form>
@@ -433,12 +365,12 @@ function StudentDetails() {
   if (!student) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">Student not found</p>
+        <p className="text-gray-500">Étudiant non trouvé</p>
         <Link
           to="/students"
           className="text-blue-600 hover:underline mt-4 inline-block"
         >
-          Back to Students
+          Retour aux étudiants
         </Link>
       </div>
     );
@@ -476,79 +408,79 @@ function StudentDetails() {
           >
             <ArrowLeft className="w-6 h-6" />
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Student Details</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Détails de l'étudiant</h1>
         </div>
         <div className="flex space-x-3">
           <button
             onClick={() => setIsPaymentModalOpen(true)}
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
           >
-            Add Payment
+            Ajouter un paiement
           </button>
           <button
             onClick={() => setIsModalOpen(true)}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
           >
-            Edit Student
+            Éditer l'étudiant
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Personal Information */}
+        {/* Informations personnelles */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">Personal Information</h2>
+          <h2 className="text-lg font-semibold mb-4">Informations personnelles</h2>
           <div className="space-y-4">
             <div>
-              <label className="text-sm text-gray-500">Full Name</label>
+              <label className="text-sm text-gray-500">Nom complet</label>
               <p className="font-medium">
                 {student.prenom} {student.nom}
               </p>
             </div>
             <div>
-              <label className="text-sm text-gray-500">Birth Date</label>
+              <label className="text-sm text-gray-500">Date de naissance</label>
               <p className="font-medium">
                 {student.date_naissance ? new Date(student.date_naissance).toLocaleDateString() : "-"}
               </p>
             </div>
             <div>
-              <label className="text-sm text-gray-500">Phone</label>
+              <label className="text-sm text-gray-500">Téléphone</label>
               <p className="font-medium">{student.telephone}</p>
             </div>
             <div>
-              <label className="text-sm text-gray-500">Address</label>
+              <label className="text-sm text-gray-500">Adresse</label>
               <p className="font-medium">{student.adresse}</p>
             </div>
             <div>
-              <label className="text-sm text-gray-500">Gender</label>
+              <label className="text-sm text-gray-500">Sexe</label>
               <p className="font-medium">
-                {student.sexe === "M" ? "Male" : "Female"}
+                {student.sexe === "M" ? "Masculin" : "Féminin"}
               </p>
             </div>
             <div>
-              <label className="text-sm text-gray-500">Nationality</label>
+              <label className="text-sm text-gray-500">Nationalité</label>
               <p className="font-medium">{student.nationalite}</p>
             </div>
             <div>
-              <label className="text-sm text-gray-500">Emergency Contact</label>
+              <label className="text-sm text-gray-500">Contact d'urgence</label>
               <p className="font-medium">{student.contact_urgence}</p>
             </div>
           </div>
         </div>
 
-        {/* Groups */}
+        {/* Groupes */}
         <div className="bg-white rounded-lg shadow p-6">
           <div>
             <div className="flex justify-between items-center mb-2">
               <label className="block text-sm font-medium text-gray-700">
-                Groups
+                Groupes
               </label>
               <button
                 type="button"
                 onClick={handleAddField}
                 className="text-sm text-blue-600 hover:text-blue-700"
               >
-                + Add Group
+                + Ajouter un groupe
               </button>
             </div>
             <div className="space-y-2">
@@ -566,7 +498,7 @@ function StudentDetails() {
                       setSelectedGrp(e.target.value);
                     }}
                   >
-                    <option value="">Select a group</option>
+                    <option value="">Sélectionner un groupe</option>
                     {groups.map((g) => (
                       <option key={g?.id} value={g?.id}>
                         {g?.nom_groupe}
@@ -592,11 +524,11 @@ function StudentDetails() {
             </div>
           </div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Groups</h2>
+            <h2 className="text-lg font-semibold">Groupes</h2>
             <div className="flex items-center space-x-2">
               <Users className="w-5 h-5 text-blue-600" />
               <span className="text-sm font-medium">
-                {student.total_groupes} group(s)
+                {student.total_groupes} groupe(s)
               </span>
             </div>
           </div>
@@ -606,19 +538,19 @@ function StudentDetails() {
                 <h3 className="font-medium text-lg mb-2">{group.nom_groupe}</h3>
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-500">Level:</span>
+                    <span className="text-sm text-gray-500">Niveau:</span>
                     <span className="text-sm font-medium">
                       {group.niveau.nom_niveau}
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-500">Branch:</span>
+                    <span className="text-sm text-gray-500">Filière:</span>
                     <span className="text-sm font-medium">
                       {group.filiere.nom_filiere}
                     </span>
                   </div>
                   <div>
-                    <span className="text-sm text-gray-500">Subjects:</span>
+                    <span className="text-sm text-gray-500">Matières:</span>
                     <div className="flex flex-wrap gap-2 mt-1">
                       {group.matieres.map((matiere) => (
                         <span
@@ -631,7 +563,7 @@ function StudentDetails() {
                     </div>
                   </div>
                   <div>
-                    <span className="text-sm text-gray-500">Teachers:</span>
+                    <span className="text-sm text-gray-500">Professeurs:</span>
                     <div className="mt-1 space-y-1">
                       {group.professeurs.map((prof) => (
                         <div key={prof.id} className="text-sm">
@@ -646,10 +578,10 @@ function StudentDetails() {
           </div>
         </div>
 
-        {/* Payments */}
+        {/* Paiements */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Payments</h2>
+            <h2 className="text-lg font-semibold">Paiements</h2>
             <div className="flex items-center space-x-2">
               <Wallet className="w-5 h-5 text-green-600" />
               <span className="text-sm font-medium">
@@ -692,7 +624,7 @@ function StudentDetails() {
       <Modal
         isOpen={isPaymentModalOpen}
         onClose={() => setIsPaymentModalOpen(false)}
-        title="Add New Payment"
+        title="Ajouter un paiement"
       >
         <PaymentForm
           onSubmit={handleAddPayment}
@@ -708,7 +640,7 @@ function StudentDetails() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Edit Student"
+        title="Éditer l'étudiant"
       >
         <EditStudentForm
           onSubmit={handleEditStudent}

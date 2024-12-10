@@ -72,7 +72,7 @@ function Groups() {
 
   const columns: ColumnDef<Group>[] = [
     {
-      header: "Group Name",
+      header: "Nom du groupe",
       accessorKey: "nom_groupe",
       cell: ({ row }) => (
         <div>
@@ -80,13 +80,13 @@ function Groups() {
             {row.original.nom_groupe}
           </span>
           <span className="text-xs text-gray-500">
-            Created {new Date(row.original.created_at).toLocaleDateString()}
+            Créé le {new Date(row.original.created_at).toLocaleDateString()}
           </span>
         </div>
       ),
     },
     {
-      header: "Level & Branch",
+      header: "Niveau & Filière",
       id: "level_branch",
       cell: ({ row }) => (
         <div className="space-y-1">
@@ -100,16 +100,16 @@ function Groups() {
       ),
     },
     {
-      header: "Subscription Price",
+      header: "Prix de l'abonnement",
       accessorKey: "prix_subscription",
       cell: ({ row }) => (
         <span className="font-medium text-green-600">
-          ${row.original.prix_subscription?.toLocaleString() || 0}
+          {row.original.prix_subscription?.toLocaleString()} MAD
         </span>
       ),
     },
     {
-      header: "Capacity",
+      header: "Capacité",
       id: "capacity",
       cell: ({ row }) => (
         <div className="space-y-1">
@@ -120,13 +120,13 @@ function Groups() {
             </span>
           </div>
           <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-            Max Students
+            Étudiants maximum
           </span>
         </div>
       ),
     },
     {
-      header: "Teachers & Commissions",
+      header: "Professeurs & Commissions",
       id: "teachers",
       cell: ({ row }) => (
         <div className="space-y-2">
@@ -139,7 +139,7 @@ function Groups() {
                 {prof.prenom} {prof.nom}
               </span>
               <span className="text-green-600 font-medium">
-                ${prof.commission_fixe}
+                {prof.commission_fixe} MAD
               </span>
             </div>
           ))}
@@ -147,7 +147,7 @@ function Groups() {
       ),
     },
     {
-      header: "Subjects",
+      header: "Matières",
       accessorKey: "matieres",
       cell: ({ row }) => (
         <div className="flex flex-wrap gap-1">
@@ -415,7 +415,7 @@ function Groups() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Group Name
+            Nom du groupe
           </label>
           <input
             type="text"
@@ -430,7 +430,7 @@ function Groups() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Level
+            Niveau
           </label>
           <select
             required
@@ -440,7 +440,7 @@ function Groups() {
               setFormData({ ...formData, niveau: Number(e.target.value) })
             }
           >
-            <option value="">Select a level</option>
+            <option value="">Sélectionner un niveau</option>
             {levels.map((level) => (
               <option key={level.id} value={level.id}>
                 {level.nom_niveau}
@@ -451,7 +451,7 @@ function Groups() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Branch
+            Filière
           </label>
           <select
             required
@@ -461,7 +461,7 @@ function Groups() {
               setFormData({ ...formData, filiere: Number(e.target.value) })
             }
           >
-            <option value="">Select a branch</option>
+            <option value="">Sélectionner une filière</option>
             {branches.map((branch) => (
               <option key={branch.id} value={branch.id}>
                 {branch.nom_filiere}
@@ -472,7 +472,7 @@ function Groups() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Max Students
+            Nombre maximum d'étudiants
           </label>
           <input
             type="number"
@@ -491,7 +491,7 @@ function Groups() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Subscription Price
+            Prix de l'abonnement
           </label>
           <input
             type="number"
@@ -512,14 +512,14 @@ function Groups() {
         <div>
           <div className="flex justify-between items-center mb-2">
             <label className="block text-sm font-medium text-gray-700">
-              Teachers
+              Professeurs
             </label>
             <button
               type="button"
               onClick={handleAddTeacher}
               className="text-sm text-blue-600 hover:text-blue-700"
             >
-              + Add Teacher
+              + Ajouter un professeur
             </button>
           </div>
           <div className="space-y-2">
@@ -536,7 +536,7 @@ function Groups() {
                     handleTeacherChange(index, "id", Number(e.target.value))
                   }
                 >
-                  <option value="">Select a teacher</option>
+                  <option value="">Sélectionner un professeur</option>
                   {teachers.map((t) => (
                     <option key={t.id} value={t.id}>
                       {t.prenom} {t.nom} - {t.specialite}
@@ -573,7 +573,7 @@ function Groups() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Subjects
+            Matières
           </label>
           <div className="space-y-2">
             {subjects.map((subject) => (
@@ -607,13 +607,13 @@ function Groups() {
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
           >
-            Cancel
+            Annuler
           </button>
           <button
             type="submit"
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
-            {initialData ? "Update Group" : "Add Group"}
+            {initialData ? "Mettre à jour le groupe" : "Ajouter un groupe"}
           </button>
         </div>
       </form>
@@ -623,26 +623,26 @@ function Groups() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Groups</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Groupes</h1>
         <button
           onClick={() => setIsModalOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          Add Group
+          Ajouter un groupe
         </button>
       </div>
       <div className="bg-white rounded-lg shadow p-6">
         <DataTable
           columns={columns}
           data={grpsWithActions}
-          searchPlaceholder="Search groups..."
+          searchPlaceholder="Rechercher des groupes..."
         />
       </div>
 
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Add New Group"
+        title="Ajouter un nouveau groupe"
       >
         <GroupForm
           onSubmit={handleAddGroup}
@@ -653,7 +653,7 @@ function Groups() {
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        title="Update Group"
+        title="Mettre à jour le groupe"
       >
         {selectedGroup && (
           <GroupForm
@@ -681,7 +681,7 @@ function Groups() {
             setGroupToDelete(null);
             // Show success message
             // alert("Group deleted successfully!");
-            toast.error("Deleted Successfully", {
+            toast.error("Supprimé avec succès", {
               position: "top-center",
               autoClose: 5000,
               hideProgressBar: false,
@@ -698,7 +698,7 @@ function Groups() {
           }
         }}
         onCancel={() => setGroupToDelete(null)}
-        message="Do you really want to delete this group?"
+        message="Voulez-vous vraiment supprimer ce groupe ?"
       />
     </div>
   );
