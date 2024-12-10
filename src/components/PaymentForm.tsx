@@ -30,17 +30,6 @@ function PaymentForm({
   fetch,
   fetch2,
 }: PaymentFormProps) {
-  // const [formData, setFormData] = useState<PaymentFormData[]>([
-  //   {
-  //     montant: remainingAmount || 0,
-  //     frais_inscription: 0,
-  //     // statut_paiement: "",
-  //     etudiant_id: initialStudentId || 0,
-  //     groupe_id: groups[0]?.id || 0,
-  //     commission_percentage: 100,
-  //   },
-  // ]);
-
   const [formData, setFormData] = useState<PaymentFormData[]>([
     {
       montant: remainingAmount || 0,
@@ -52,203 +41,65 @@ function PaymentForm({
   ]);
 
   const [data, setData] = useState([]);
-
   const [pays, setPays] = useState<any>([]);
-
-  // useEffect(() => {
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     etudiant_id: initialStudentId || prev.etudiant_id,
-  //     groupe_id: groups[0]?.id || prev.groupe_id,
-  //     montant: remainingAmount || prev.montant,
-  //   }));
-  // }, [initialStudentId, groups, remainingAmount]);
-
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   if (formData.montant <= 0) {
-  //     alert("Amount must be greater than 0");
-  //     return;
-  //   }
-  //   if (remainingAmount && formData.montant > remainingAmount) {
-  //     alert(`The maximum remaining amount is $${remainingAmount}`);
-  //     return;
-  //   }
-  //   onSubmit(formData);
-  // };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (formData.montant <= 0) {
-      alert("Amount must be greater than 0");
-      return;
-    }
-    if (isCompletion) {
-      await updatePayment({ montant: formData[0].montant }, id);
-      fetch();
-      return;
-    }
-    // const createdPay = await createPayment(formData);
-    const createdPay = await createPayment({ payments: formData });
-    setPays(createdPay);
-    onSubmit(formData);
-    onClose();
-    // if (createdPay) {
-    //   alert("Payment created successfully!");
-    // } else {
-    //   alert("Failed to create group.");
-    // }
-  };
-
-  const printPayment = () => {
-    const printContent = document.getElementById("printable-payment");
-    if (!printContent) return;
-
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) return;
-
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Payment Receipt</title>
-          <style>
-            body {
-              font-family: system-ui, -apple-system, sans-serif;
-              line-height: 1.5;
-              margin: 0;
-              padding: 20px;
-            }
-            .print-content {
-              max-width: 800px;
-              margin: 0 auto;
-            }
-            .grid {
-              display: grid;
-              grid-template-columns: 1fr 1fr;
-              gap: 1rem;
-            }
-            .text-center { text-align: center; }
-            .text-right { text-align: right; }
-            .mb-8 { margin-bottom: 2rem; }
-            .mb-2 { margin-bottom: 0.5rem; }
-            .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
-            .font-bold { font-weight: bold; }
-            .text-2xl { font-size: 1.5rem; }
-            .text-sm { font-size: 0.875rem; }
-            .text-gray-500 { color: #6b7280; }
-            .border-t { border-top: 1px solid #e5e7eb; }
-            .border-b { border-bottom: 1px solid #e5e7eb; }
-            @media print {
-              body { print-color-adjust: exact; }
-            }
-          </style>
-        </head>
-        <body>
-          ${printContent.outerHTML}
-        </body>
-      </html>
-    `);
-
-    printWindow.document.close();
-
-    printWindow.focus();
-
-    setTimeout(() => {
-      printWindow.print();
-      printWindow.close();
-    }, 250);
-  };
-
-  function PrintablePayment({ payments }: { payments: any[] }) {
-    return (
-      <div className="p-8 bg-white" id="printable-payment">
-        {payments?.map((payment) => {
-          return (
-            <div>
-              <div className="text-center mb-8">
-                <h1 className="text-2xl font-bold">Reçu de Paiement</h1>
-                <p className="text-gray-500">#{payment?.payment?.id}</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div>
-                  <h2 className="font-bold mb-2">Informations de l'Étudiant</h2>
-                  <p>
-                    {payment?.payment?.etudiant.prenom}{" "}
-                    {payment?.payment?.etudiant.nom}
-                  </p>
-                  <p>{payment?.payment?.etudiant.telephone}</p>
-                  <p>{payment?.payment?.etudiant.adresse}</p>
-                </div>
-                <div className="text-right">
-                  <h2 className="font-bold mb-2">Détails du Paiement</h2>
-                  <p>
-                    Date :{" "}
-                    {new Date(
-                      payment?.payment?.date_paiement
-                    ).toLocaleDateString()}
-                  </p>
-                  <p>Statut : {payment?.payment?.statut_paiement}</p>
-                  <p>Groupe : {payment?.payment?.groupe.nom_groupe}</p>
-                  <p>Montant Restant : {payment?.payment?.remaining} MAD</p>
-                </div>
-              </div>
-
-              <div className="border-t border-b border-gray-200 py-4 mb-8">
-                <div className="flex justify-between mb-2">
-                  <span className="font-bold">Montant Payé :</span>
-                  <span>{payment?.payment?.montant.toLocaleString()} MAD</span>
-                </div>
-                {payment?.payment?.montant_total &&
-                  payment?.payment?.statut_paiement === "Partiel" && (
-                    <div className="flex justify-between mb-2">
-                      <span className="font-bold">Montant Total :</span>
-                      <span>
-                        {payment?.payment?.montant_total.toLocaleString()} MAD
-                      </span>
-                    </div>
-                  )}
-                {/* <div className="flex justify-between">
-                  <span className="font-bold">Taux de Commission :</span>
-                  <span>{payment?.payment?.commission_percentage}%</span>
-                </div> */}
-              </div>
-
-              <div className="text-center text-sm text-gray-500">
-                <p>Merci pour votre paiement !</p>
-                <p>Ceci est un document généré par ordinateur.</p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
-
-  const [fields, setFields] = useState<{ id: number; value: string }[]>([
-    { id: Date.now(), value: "" },
-  ]);
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [buttonsDisabled, setButtonsDisabled] = useState(
     Array(groups.length).fill(false) // Initialize an array with `false` values
   );
-  // Add a new field
-  // const handleAddField = () => {
-  //   setFields((prevFields) => [
-  //     ...prevFields,
-  //     { id: Date.now(), value: "" }, // Add a new field with an empty value
-  //   ]);
-  // };
 
-  // Remove a specific field
-  // const handleRemoveField = (id: number) => {
-  //   setFields((prevFields) => prevFields.filter((field) => field.id !== id));
-  // };
-  // Handle change in a specific field
-  // const handleFieldChange = (id: number, value: string) => {
-  //   setFields((prevFields) =>
-  //     prevFields.map((field) => (field.id === id ? { ...field, value } : field))
-  //   );
-  // };
+  const validateForm = (data: PaymentFormData) => {
+    const newErrors: {[key: string]: string} = {};
+    
+    if (data.montant <= 0) {
+      newErrors.montant = "Le montant doit être supérieur à 0";
+    }
+    if (remainingAmount && data.montant > remainingAmount) {
+      newErrors.montant = `Le montant maximum autorisé est ${remainingAmount} MAD`;
+    }
+    if (data.frais_inscription < 0) {
+      newErrors.frais_inscription = "Les frais d'inscription ne peuvent pas être négatifs";
+    }
+    if (data.commission_percentage < 0 || data.commission_percentage > 100) {
+      newErrors.commission_percentage = "La commission doit être comprise entre 0 et 100";
+    }
+    if (!data.groupe_id) {
+      newErrors.groupe_id = "Veuillez sélectionner un groupe";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Validate all form data entries
+    const isValid = formData.every(validateForm);
+    if (!isValid) return;
+
+    try {
+      if (isCompletion) {
+        await updatePayment({ montant: formData[0].montant }, id);
+        fetch();
+        onClose();
+        return;
+      }
+
+      const createdPay = await createPayment({ payments: formData });
+      if (createdPay) {
+        setPays(createdPay);
+        onSubmit(formData);
+        onClose();
+        fetch();
+        fetch2();
+      } else {
+        setErrors({ submit: "Failed to create payment. Please try again." });
+      }
+    } catch (error) {
+      console.error("Error creating payment:", error);
+      setErrors({ submit: "Failed to create payment. Please try again." });
+    }
+  };
 
   const handleRemoveField = (index: number) => {
     setFormData((prev) => {
@@ -263,16 +114,23 @@ function PaymentForm({
   const handleAddField = () => {
     setFormData((prev) => {
       if (!Array.isArray(prev)) {
-        console.error("formDataList is not an array:", prev);
-        return [];
+        return [
+          {
+            montant: 0,
+            frais_inscription: 0,
+            etudiant_id: initialStudentId || 0,
+            groupe_id: groups[0]?.id || 0,
+            commission_percentage: 100,
+          },
+        ];
       }
       return [
         ...prev,
         {
           montant: 0,
           frais_inscription: 0,
-          etudiant_id: initialStudentId,
-          groupe_id: 0,
+          etudiant_id: initialStudentId || 0,
+          groupe_id: groups[0]?.id || 0,
           commission_percentage: 100,
         },
       ];
@@ -299,59 +157,64 @@ function PaymentForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {Array.isArray(formData) &&
-        formData.map((field, index) => {
-          if (index <= groups.length - 1) {
-            return (
+      {formData.map((field, index) => (
+        <div key={index} className="p-4 border rounded-lg bg-white shadow-sm">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Montant (MAD) *
+              </label>
+              <div className="mt-1 relative rounded-md shadow-sm">
+                <input
+                  type="number"
+                  required
+                  min="0.01"
+                  step="0.01"
+                  max={remainingAmount}
+                  className={`block w-full rounded-md ${
+                    errors.montant 
+                      ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                      : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                  }`}
+                  value={field?.montant || ""}
+                  onChange={(e) => {
+                    handleFieldChange(
+                      index,
+                      "montant",
+                      parseFloat(e.target.value)
+                    );
+                  }}
+                />
+                {errors.montant && (
+                  <p className="mt-1 text-sm text-red-600">{errors.montant}</p>
+                )}
+              </div>
+              {remainingAmount && (
+                <p className="mt-1 text-sm text-gray-500">
+                  Montant restant: {remainingAmount.toLocaleString()} MAD
+                </p>
+              )}
+            </div>
+
+            {!isCompletion && (
               <>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Amount
+                    Frais d'inscription (MAD)
                   </label>
-                  <input
-                    type="number"
-                    required
-                    min="0.01"
-                    step="0.01"
-                    max={remainingAmount}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    value={field?.montant || ""}
-                    onChange={(e) => {
-                      // setFormData({
-                      //   ...formData,
-                      //   montant: parseFloat(e.target.value),
-                      // });
-                      handleFieldChange(
-                        index,
-                        "montant",
-                        parseFloat(e.target.value)
-                      );
-                    }}
-                  />
-                  {remainingAmount && (
-                    <p className="mt-1 text-sm text-gray-500">
-                      Remaining amount: {remainingAmount.toLocaleString()} MAD
-                    </p>
-                  )}
-                </div>
-
-                {!isCompletion && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Registration Fee
-                    </label>
+                  <div className="mt-1 relative rounded-md shadow-sm">
                     <input
                       type="number"
                       required
-                      min={0}
+                      min="0.01"
                       step="0.01"
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      value={field?.frais_inscription || 0}
+                      className={`block w-full rounded-md ${
+                        errors.frais_inscription 
+                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                          : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                      }`}
+                      value={field?.frais_inscription || ""}
                       onChange={(e) => {
-                        // setFormData({
-                        //   ...formData,
-                        //   frais_inscription: parseFloat(e.target.value),
-                        // });
                         handleFieldChange(
                           index,
                           "frais_inscription",
@@ -359,200 +222,117 @@ function PaymentForm({
                         );
                       }}
                     />
-                    <p className="mt-1 text-sm text-gray-500">
-                      One-time registration fee for new students
-                    </p>
+                    {errors.frais_inscription && (
+                      <p className="mt-1 text-sm text-red-600">{errors.frais_inscription}</p>
+                    )}
                   </div>
-                )}
+                </div>
 
-                {/* {!isCompletion && !initialStudentId && students.length > 0 && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Student
-                    </label>
-                    <select
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Groupe *
+                  </label>
+                  <select
+                    required
+                    className={`mt-1 block w-full rounded-md ${
+                      errors.groupe_id 
+                        ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                        : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                    }`}
+                    value={field?.groupe_id || ""}
+                    onChange={(e) =>
+                      handleFieldChange(
+                        index,
+                        "groupe_id",
+                        parseInt(e.target.value)
+                      )
+                    }
+                  >
+                    <option value="">Sélectionner un groupe</option>
+                    {groups.map((group) => (
+                      <option key={group.id} value={group.id}>
+                        {group.nom_groupe}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.groupe_id && (
+                    <p className="mt-1 text-sm text-red-600">{errors.groupe_id}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Commission (%)
+                  </label>
+                  <div className="mt-1 relative rounded-md shadow-sm">
+                    <input
+                      type="number"
                       required
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      value={field?.etudiant_id || ""}
-                      onChange={(e) => {
-                        // setFormData({
-                        //   ...formData,
-                        //   etudiant_id: parseInt(e.target.value),
-                        // });
-                        handleFieldChange(index, "etudiant_id", e.target.value);
-                      }}
-                    >
-                      <option value="">Select a student</option>
-                      {students.map((student) => (
-                        <option key={student.id} value={student.id}>
-                          {student.prenom} {student.nom}
-                        </option>
-                      ))}
-                    </select>
+                      min="0"
+                      max="100"
+                      step="1"
+                      className={`block w-full rounded-md ${
+                        errors.commission_percentage 
+                          ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                          : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                      }`}
+                      value={field?.commission_percentage || ""}
+                      onChange={(e) =>
+                        handleFieldChange(
+                          index,
+                          "commission_percentage",
+                          parseInt(e.target.value)
+                        )
+                      }
+                    />
+                    {errors.commission_percentage && (
+                      <p className="mt-1 text-sm text-red-600">{errors.commission_percentage}</p>
+                    )}
                   </div>
-                )} */}
-
-                {!isCompletion && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        Group
-                      </label>
-                      <select
-                        required
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        value={field?.groupe_id || ""}
-                        onChange={(e) => {
-                          // setFormData({
-                          //   ...formData,
-                          //   groupe_id: parseInt(e.target.value),
-                          // });
-                          handleFieldChange(index, "groupe_id", e.target.value);
-                        }}
-                      >
-                        <option value="" disabled>
-                          Select a group
-                        </option>
-                        {groups.map((group) => (
-                          <option key={group.id} value={group.id}>
-                            {group.nom_groupe}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        Commission Percentage
-                      </label>
-                      <input
-                        type="number"
-                        required
-                        min="0"
-                        max="100"
-                        step="0.1"
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        value={field?.commission_percentage || 0}
-                        onChange={(e) => {
-                          // setFormData({
-                          //   ...formData,
-                          //   commission_percentage: parseFloat(e.target.value),
-                          // });
-                          handleFieldChange(
-                            index,
-                            "commission_percentage",
-                            parseFloat(e.target.value)
-                          );
-                        }}
-                      />
-                    </div>
-                  </>
-                )}
-                {!isCompletion && (
-                  <div className="flex space-x-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        handleRemoveField(index);
-                        // setData((prevItems) =>
-                        //   prevItems.filter((_, i) => i !== index)
-                        // );
-                      }}
-                      className="px-2 py-2 text-sm font-medium text-white bg-rose-500 rounded-md hover:bg-rose-700"
-                    >
-                      <Minus size={15} />
-                    </button>
-                    <button
-                      disabled={buttonsDisabled[index]}
-                      type="button"
-                      onClick={() => {
-                        // if (
-                        //   formData?.montant > 0 &&
-                        //   formData?.frais_inscription > 0 &&
-                        //   formData?.etudiant_id !== null &&
-                        //   formData?.groupe_id !== null &&
-                        //   formData?.commission_percentage > 0
-                        // ) {
-                        setButtonsDisabled((prev) => {
-                          const updated = [...prev];
-                          updated[index] = true; // Disable the button at the clicked index
-                          return updated;
-                        });
-                        setData((prev) => [...prev, formData]);
-                        // }
-                      }}
-                      className="px-2 py-2 text-sm font-medium text-white bg-green-500 rounded-md hover:bg-green-700"
-                    >
-                      <Check size={15} />
-                    </button>
-                  </div>
-                )}
+                </div>
               </>
-            );
-          }
-        })}
+            )}
+          </div>
 
-      <div className="flex justify-end space-x-3 mt-6">
+          {formData.length > 1 && (
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                type="button"
+                onClick={() => handleRemoveField(index)}
+                className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                <Minus size={16} className="mr-1" />
+                Supprimer
+              </button>
+            </div>
+          )}
+        </div>
+      ))}
+
+      <div className="flex justify-end space-x-2 mt-4">
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+          className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-        >
-          {isCompletion ? "Complete Payment" : "Create Payment"}
+          Annuler
         </button>
         {!isCompletion && (
-          <>
-            <button
-              type="button"
-              onClick={handleAddField}
-              className="px-2 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-            >
-              <Plus size={15} />
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                printPayment();
-                setIsPrintModalOpen(true);
-                console.log(pays);
-                // fetch2();
-              }}
-              className="px-2 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-            >
-              <Printer size={15} />
-            </button>
-          </>
+          <button
+            type="button"
+            onClick={handleAddField}
+            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <Plus size={16} className="mr-1" />
+            Ajouter un paiement
+          </button>
         )}
-        <Modal
-          isOpen={isPrintModalOpen}
-          onClose={() => {
-            setIsPrintModalOpen(false);
-          }}
-          title="Print Payments"
+        <button
+          type="submit"
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
         >
-          <PrintablePayment payments={pays} />
-          <div className="flex justify-end space-x-3 mt-6 no-print">
-            <button
-              onClick={() => setIsPrintModalOpen(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={printPayment}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-            >
-              Print
-            </button>
-          </div>
-        </Modal>
+          {isCompletion ? "Terminer le paiement" : "Créer le paiement"}
+        </button>
       </div>
     </form>
   );

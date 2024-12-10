@@ -133,7 +133,7 @@ const columns: ColumnDef<Commission>[] = [
     accessorKey: "montant",
     cell: ({ row }) => (
       <span className="font-medium">
-        ${row.original.montant.toLocaleString()}
+        {row.original.montant.toLocaleString()} MAD
       </span>
     ),
   },
@@ -149,12 +149,12 @@ const columns: ColumnDef<Commission>[] = [
     cell: ({ row }) => (
       <span
         className={`px-2 py-1 rounded-full text-xs ${
-          row.original.statut_comission === "PAID"
+          row.original.statut_comission.toLowerCase() === "paid"
             ? "bg-green-100 text-green-800"
             : "bg-yellow-100 text-yellow-800"
         }`}
       >
-        {row.original.statut_comission}
+        {row.original.statut_comission.toLowerCase()}
       </span>
     ),
   },
@@ -335,7 +335,7 @@ function PrintableCommissions({
 
       <div className="mb-6">
         <h2 className="text-lg font-semibold mb-2">Summary</h2>
-        <p>Total Commissions: ${totalAmount.toLocaleString()}</p>
+        <p>Total Commissions: {totalAmount.toLocaleString()} MAD</p>
         <p>Total Records: {data.length}</p>
       </div>
 
@@ -373,12 +373,12 @@ function PrintableCommissions({
                 </div>
               </td>
               <td className="px-4 py-2">
-                ${commission.montant.toLocaleString()}
+                {commission.montant.toLocaleString()} MAD
               </td>
               <td className="px-4 py-2">
                 {new Date(commission.date_comission).toLocaleDateString()}
               </td>
-              <td className="px-4 py-2">{commission.statut_comission}</td>
+              <td className="px-4 py-2">{commission.statut_comission.toLowerCase()}</td>
             </tr>
           ))}
         </tbody>
@@ -388,7 +388,7 @@ function PrintableCommissions({
               Total
             </td>
             <td colSpan={3} className="px-4 py-2 font-medium">
-              ${totalAmount.toLocaleString()}
+              {totalAmount.toLocaleString()} MAD
             </td>
           </tr>
         </tfoot>
@@ -512,7 +512,7 @@ function Commissions() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Commissions</h1>
             <p className="text-sm text-gray-500">
-              Total commissions: ${totalAmount.toLocaleString()}
+              Total commissions: {totalAmount.toLocaleString()} MAD
             </p>
           </div>
           <div className="space-x-3">

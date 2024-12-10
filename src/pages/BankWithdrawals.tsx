@@ -85,7 +85,7 @@ function BankWithdrawals() {
             }[row.original.mode_paiement]
           }`}
         >
-          {row.original.mode_paiement}
+          {row.original.mode_paiement.toLowerCase()}
         </span>
       ),
     },
@@ -94,7 +94,7 @@ function BankWithdrawals() {
       accessorKey: "montant",
       cell: ({ row }) => (
         <span className="font-medium">
-          ${row.original.montant.toLocaleString()}
+          {row.original.montant.toLocaleString()} MAD
         </span>
       ),
     },
@@ -293,7 +293,7 @@ function BankWithdrawals() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Sorties Banque</h1>
           <p className="text-sm text-gray-500">
-            Total: ${totalAmount.toLocaleString()}
+            Total: {totalAmount.toLocaleString()} MAD
           </p>
         </div>
         <button

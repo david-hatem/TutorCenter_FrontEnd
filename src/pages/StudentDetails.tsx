@@ -397,31 +397,8 @@ function StudentDetails() {
 
   const handleAddPayment = async (paymentData: PaymentFormData) => {
     try {
-      // Here you would make an API call to create the payment
-      console.log("Creating payment:", paymentData);
-
-      // After successful creation, update the student's payments list
-      // const newPayment = {
-      //   id: Date.now(),
-      //   montant: paymentData.montant,
-      //   date_paiement: new Date().toISOString(),
-      //   statut_paiement: paymentData.statut_paiement,
-      //   groupe:
-      //     student?.groupes.find((g) => g.id === paymentData.groupe_id)
-      //       ?.nom_groupe || "",
-      // };
-
-      // setStudent((prev) =>
-      //   prev
-      //     ? {
-      //         ...prev,
-      //         paiements: [...prev.paiements, newPayment],
-      //         total_paiements: prev.total_paiements + paymentData.montant,
-      //       }
-      //     : null
-      // );
-
       setIsPaymentModalOpen(false);
+      await fetchEtudiantDetails(); // Refresh student data after payment
     } catch (error) {
       console.error("Error creating payment:", error);
     }
@@ -676,7 +653,7 @@ function StudentDetails() {
             <div className="flex items-center space-x-2">
               <Wallet className="w-5 h-5 text-green-600" />
               <span className="text-sm font-medium">
-                ${student.total_paiements.toLocaleString()}
+                {student.total_paiements.toLocaleString()} MAD
               </span>
             </div>
           </div>
@@ -688,19 +665,19 @@ function StudentDetails() {
               >
                 <div>
                   <p className="font-medium">
-                    ${payment.montant.toLocaleString()}
+                    {payment.montant.toLocaleString()} MAD
                   </p>
                   <p className="text-sm text-gray-500">{payment.groupe}</p>
                 </div>
                 <div className="text-right">
                   <span
                     className={`px-2 py-1 rounded-full text-xs ${
-                      payment.statut_paiement === "PAID"
+                      payment.statut_paiement.toLowerCase() === "paid"
                         ? "bg-green-100 text-green-800"
                         : "bg-yellow-100 text-yellow-800"
                     }`}
                   >
-                    {payment.statut_paiement}
+                    {payment.statut_paiement.toLowerCase()}
                   </span>
                   <p className="text-sm text-gray-500 mt-1">
                     {new Date(payment.date_paiement).toLocaleDateString()}
@@ -718,11 +695,12 @@ function StudentDetails() {
         title="Add New Payment"
       >
         <PaymentForm
-          // onSubmit={handleAddPayment}
+          onSubmit={handleAddPayment}
           onClose={() => setIsPaymentModalOpen(false)}
           initialStudentId={student.id}
           students={[]}
           groups={student.groupes}
+          fetch={fetchEtudiantDetails}
           fetch2={fetchEtudiantDetails}
         />
       </Modal>

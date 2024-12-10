@@ -67,13 +67,18 @@ function Expenses() {
     {
       header: "Libellé",
       accessorKey: "libele",
+      cell: ({ row }) => (
+        <span className="font-medium">
+          {row.original.libele}
+        </span>
+      ),
     },
     {
       header: "Montant",
       accessorKey: "montant",
       cell: ({ row }) => (
         <span className="font-medium">
-          ${row.original.montant.toLocaleString()}
+          {row.original.montant.toLocaleString()} MAD
         </span>
       ),
     },
@@ -264,7 +269,7 @@ function Expenses() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Dépenses</h1>
           <p className="text-sm text-gray-500">
-            Total: ${totalAmount.toLocaleString()}
+            Total des dépenses: {totalAmount.toLocaleString()} MAD
           </p>
         </div>
         <button
