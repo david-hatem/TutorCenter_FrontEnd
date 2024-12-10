@@ -89,7 +89,7 @@ function SubjectDetails({
     <div className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700">
-          Subject Name
+          Nom de la matière
         </label>
         <p className="mt-1 text-sm text-gray-900">{subject.nom_matiere}</p>
       </div>
@@ -101,7 +101,7 @@ function SubjectDetails({
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700">
-          Created At
+          Créé le
         </label>
         <p className="mt-1 text-sm text-gray-900">
           {new Date(subject.created_at).toLocaleDateString()}
@@ -112,7 +112,7 @@ function SubjectDetails({
           onClick={onClose}
           className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
         >
-          Close
+          Fermer
         </button>
       </div>
     </div>
@@ -132,7 +132,7 @@ function Subjects() {
 
   const columns: ColumnDef<Subject>[] = [
     {
-      header: "Subject Name",
+      header: "Nom de la matière",
       accessorKey: "nom_matiere",
       cell: ({ row }) => (
         <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
@@ -145,7 +145,7 @@ function Subjects() {
       accessorKey: "description",
     },
     {
-      header: "Created At",
+      header: "Créé le",
       accessorKey: "created_at",
       cell: ({ row }) => new Date(row.original.created_at).toLocaleDateString(),
     },
@@ -185,7 +185,7 @@ function Subjects() {
               );
               setSubjects(subjects.filter((s) => s.id !== subToDelete));
               setSubToDelete(null);
-              toast.error("Deleted Successfully", {
+              toast.error("Supprimé avec succès", {
                 position: "top-center",
                 autoClose: 5000,
                 hideProgressBar: false,
@@ -198,7 +198,7 @@ function Subjects() {
               });
             }}
             onCancel={() => setSubToDelete(null)}
-            message="Do you really want to delete."
+            message="Voulez-vous vraiment supprimer cette matière ?"
           />
         </div>
       ),
@@ -304,7 +304,7 @@ function Subjects() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Subject Name
+            Nom de la matière *
           </label>
           <input
             type="text"
@@ -318,10 +318,9 @@ function Subjects() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Description
+            Description (optionnelle)
           </label>
           <textarea
-            required
             rows={3}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             value={formData.description}
@@ -336,13 +335,13 @@ function Subjects() {
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
           >
-            Cancel
+            Annuler
           </button>
           <button
             type="submit"
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
           >
-            {initialData ? "Update Subject" : "Add Subject"}
+            {initialData ? "Mettre à jour la matière" : "Ajouter la matière"}
           </button>
         </div>
       </form>
@@ -352,19 +351,19 @@ function Subjects() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Subjects</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Matières</h1>
         <button
           onClick={() => setIsAddModalOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
-          Add Subject
+          Ajouter une matière
         </button>
       </div>
       <div className="bg-white rounded-lg shadow p-6">
         <DataTable
           columns={columns}
           data={subjectsWithActions}
-          searchPlaceholder="Search subjects..."
+          searchPlaceholder="Rechercher des matières..."
         />
       </div>
 
@@ -372,7 +371,7 @@ function Subjects() {
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title="Add New Subject"
+        title="Ajouter une nouvelle matière"
       >
         <SubjectForm
           onSubmit={handleAddSubject}
@@ -387,7 +386,7 @@ function Subjects() {
           setIsEditModalOpen(false);
           setSelectedSubject(null);
         }}
-        title="Edit Subject"
+        title="Modifier la matière"
       >
         {selectedSubject && (
           <SubjectForm
@@ -408,7 +407,7 @@ function Subjects() {
           setIsViewModalOpen(false);
           setSelectedSubject(null);
         }}
-        title="Subject Details"
+        title="Détails de la matière"
       >
         {selectedSubject && (
           <SubjectDetails

@@ -267,7 +267,7 @@ function Levels() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Nom du niveau
+            Nom du niveau *
           </label>
           <input
             type="text"
@@ -281,10 +281,9 @@ function Levels() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Description
+            Description (optionnelle)
           </label>
           <textarea
-            required
             rows={3}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             value={formData.description}
