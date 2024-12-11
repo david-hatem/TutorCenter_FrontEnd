@@ -176,7 +176,7 @@ function PaymentForm({
                       ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
                       : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
                   }`}
-                  value={field?.montant || ""}
+                  value={field?.montant}
                   onChange={(e) => {
                     handleFieldChange(
                       index,
@@ -212,7 +212,7 @@ function PaymentForm({
                           ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
                           : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
                       }`}
-                      value={field?.frais_inscription || ""}
+                      value={field?.frais_inscription}
                       onChange={(e) => {
                         handleFieldChange(
                           index,
@@ -238,7 +238,7 @@ function PaymentForm({
                         ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
                         : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
                     }`}
-                    value={field?.groupe_id || ""}
+                    value={field?.groupe_id}
                     onChange={(e) =>
                       handleFieldChange(
                         index,
@@ -261,21 +261,18 @@ function PaymentForm({
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Commission (%)
+                    Commission (%) *
                   </label>
                   <div className="mt-1 relative rounded-md shadow-sm">
                     <input
                       type="number"
                       required
-                      min="0"
-                      max="100"
-                      step="1"
                       className={`block w-full rounded-md ${
                         errors.commission_percentage 
                           ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
                           : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
                       }`}
-                      value={field?.commission_percentage || ""}
+                      value={field?.commission_percentage}
                       onChange={(e) =>
                         handleFieldChange(
                           index,

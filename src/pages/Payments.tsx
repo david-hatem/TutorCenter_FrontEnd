@@ -43,7 +43,13 @@ const columns: ColumnDef<Payment>[] = [
     header: "Date",
     accessorKey: "date_paiement",
     cell: ({ row }) =>
-      new Date(row.original.date_paiement).toLocaleDateString(),
+      new Date(row.original.date_paiement).toLocaleString('fr-FR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
   },
   {
     header: "Status",
@@ -61,11 +67,11 @@ const columns: ColumnDef<Payment>[] = [
     ),
   },
   {
-    header: "Commission %",
-    accessorKey: "commission_percentage",
+    header: "Remaining",
+    accessorKey: "remaining",
     cell: ({ row }) => (
       <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-        {row.original.frais_inscription}%
+        {row.original.remaining ? `${row.original.remaining.toLocaleString()} MAD` : '-'}
       </span>
     ),
   },
@@ -114,7 +120,13 @@ function PrintablePayment({ payment }: { payment: Payment }) {
         </div>
         <div className="text-right">
           <h2 className="font-bold mb-2">Détails du Paiement</h2>
-          <p>Date : {new Date(payment.date_paiement).toLocaleDateString()}</p>
+          <p>Date : {new Date(payment.date_paiement).toLocaleString('fr-FR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      })}</p>
           <p>Statut : {payment.statut_paiement}</p>
           <p>Groupe : {payment.groupe.nom_groupe}</p>
           <p>Montant Restant : {payment.remaining} MAD</p>

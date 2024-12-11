@@ -49,6 +49,8 @@ export interface Paiement {
   date_paiement: string; // ISO date string
   statut_paiement: string;
   groupe: string;
+  commission?: number;
+  commission_percentage?: number;
 }
 
 export interface Groupe {

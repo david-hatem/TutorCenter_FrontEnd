@@ -612,7 +612,13 @@ function StudentDetails() {
                     {payment.statut_paiement.toLowerCase()}
                   </span>
                   <p className="text-sm text-gray-500 mt-1">
-                    {new Date(payment.date_paiement).toLocaleDateString()}
+                    {new Date(payment.date_paiement).toLocaleString('fr-FR', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
                   </p>
                 </div>
               </div>
