@@ -205,8 +205,7 @@ function PaymentForm({
                   <div className="mt-1 relative rounded-md shadow-sm">
                     <input
                       type="number"
-                      required
-                      min="0.01"
+                      min="0"
                       step="0.01"
                       className={`block w-full rounded-md ${
                         errors.frais_inscription 
