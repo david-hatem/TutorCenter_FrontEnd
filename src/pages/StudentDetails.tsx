@@ -590,7 +590,9 @@ function StudentDetails() {
             </div>
           </div>
           <div className="space-y-4">
-            {student.paiements.map((payment) => (
+            {[...student.paiements]
+              .sort((a, b) => new Date(b.date_paiement).getTime() - new Date(a.date_paiement).getTime())
+              .map((payment) => (
               <div
                 key={payment.id}
                 className="flex items-center justify-between p-3 border rounded-lg"
