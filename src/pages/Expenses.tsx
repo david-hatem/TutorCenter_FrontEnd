@@ -112,7 +112,7 @@ function Expenses() {
     // Fetch data from the API
     const fetchData = async () => {
       try {
-        const response = await fetch("http://167.114.0.177:81/depenses/");
+        const response = await fetch("https://deltapi.website:444/depenses/");
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -323,7 +323,7 @@ function Expenses() {
         onConfirm={async () => {
           try {
             await axios.delete(
-              `http://167.114.0.177:81/depenses/${branchToDelete}/`,
+              `https://deltapi.website:444/depenses/${branchToDelete}/`,
               {
                 headers: {
                   "Content-Type": "application/json",

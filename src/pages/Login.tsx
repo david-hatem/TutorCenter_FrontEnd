@@ -22,7 +22,8 @@ function Login() {
     setError(null);
 
     try {
-      const response = await fetch("http://167.114.0.177:81/token", {
+      console.log('Attempting to connect to:', 'https://deltapi.website:444/token');
+      const response = await fetch("https://deltapi.website:444/token", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -31,7 +32,14 @@ function Login() {
       });
 
       if (!response.ok) {
-        throw new Error(`Login failed: ${response.status}`);
+        const errorText = await response.text();
+        console.error('Response not OK:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorText,
+          headers: Object.fromEntries(response.headers.entries())
+        });
+        throw new Error(`Login failed: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
@@ -46,26 +54,33 @@ function Login() {
         secure: true,
       });
       navigate(from, { replace: true });
-      // setToken(data);
     } catch (err) {
-      setError(err.message);
+      console.error('Login error details:', {
+        name: err.name,
+        message: err.message,
+        cause: err.cause,
+        stack: err.stack
+      });
+      
+      // Check for specific SSL-related error messages
+      const errorMessage = err.message.toLowerCase();
+      if (
+        errorMessage.includes('ssl') || 
+        errorMessage.includes('certificate') ||
+        errorMessage.includes('self signed') ||
+        errorMessage.includes('unable to verify') ||
+        errorMessage.includes('self-signed') ||
+        errorMessage.includes('cert') ||
+        errorMessage.includes('security')
+      ) {
+        setError('SSL Certificate Error: The connection is not secure. Please contact your administrator.');
+      } else if (errorMessage.includes('failed to fetch') || errorMessage.includes('network')) {
+        setError('Network Error: Unable to connect to the server. Please check your connection.');
+      } else {
+        setError(err.message);
+      }
     }
   };
-
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setError("");
-  //   setIsLoading(true);
-
-  //   try {
-  //     await auth.login(username, password);
-  //     navigate(from, { replace: true });
-  //   } catch (err) {
-  //     setError("Invalid username or password");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">

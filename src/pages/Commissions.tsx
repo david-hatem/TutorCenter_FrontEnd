@@ -434,7 +434,7 @@ function Commissions() {
 
   useEffect(() => {
     // Fetch data from the API
-    fetch("http://167.114.0.177:81/commissions/?ordering=-date_comission")
+    fetch("https://deltapi.website:444/commissions/?ordering=-date_comission")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

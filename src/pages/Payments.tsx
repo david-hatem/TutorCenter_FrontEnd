@@ -258,7 +258,7 @@ function Payments() {
     try {
       setIsLoading(true);
       const response = await fetch(
-        "http://167.114.0.177:81/paiements/?ordering=-date_paiement"
+        "https://deltapi.website:444/paiements/?ordering=-date_paiement"
       );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -303,7 +303,7 @@ function Payments() {
 
       // Create new payment through API
       const response = await fetch(
-        "http://167.114.0.177:81/paiements/create/",
+        "https://deltapi.website:444/paiements/create/",
         {
           method: "POST",
           headers: {
@@ -316,7 +316,7 @@ function Payments() {
       if (response.ok) {
         // Fetch updated payments list
         const updatedResponse = await fetch(
-          "http://167.114.0.177:81/paiements/"
+          "https://deltapi.website:444/paiements/"
         );
         const data = await updatedResponse.json();
 

@@ -52,7 +52,7 @@ function Settings() {
 
     try {
       const response = await fetch(
-        "http://167.114.0.177:81/staff/change-password/",
+        "https://deltapi.website:444/staff/change-password/",
         {
           method: "PUT",
           headers: {
@@ -86,7 +86,7 @@ function Settings() {
     setError("");
 
     try {
-      const response = await fetch("http://167.114.0.177:81/staff/register/", {
+      const response = await fetch("https://deltapi.website:444/staff/register/", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${cookies.get("authToken")}`,
@@ -120,7 +120,7 @@ function Settings() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch("http://167.114.0.177:81/staff/profile/", {
+        const response = await fetch("https://deltapi.website:444/staff/profile/", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

@@ -170,7 +170,7 @@ function Levels() {
   ];
 
   useEffect(() => {
-    fetch("http://167.114.0.177:81/niveau_list/")
+    fetch("https://deltapi.website:444/niveau_list/")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -388,7 +388,7 @@ function Levels() {
         onConfirm={async () => {
           try {
             await axios.delete(
-              `http://167.114.0.177:81/niveaux/delete/${levelToDelete}/`,
+              `https://deltapi.website:444/niveaux/delete/${levelToDelete}/`,
               {
                 headers: {
                   "Content-Type": "application/json",

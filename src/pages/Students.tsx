@@ -193,7 +193,7 @@ function Students() {
 
   useEffect(() => {
     setIsLoading(true);
-    fetch("http://167.114.0.177:81/etudiant_list/")
+    fetch("https://deltapi.website:444/etudiant_list/")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -282,7 +282,7 @@ function Students() {
       const createdStd = await createStudent(submissionData);
       if (createdStd) {
         // Fetch fresh list of students
-        const response = await fetch("http://167.114.0.177:81/etudiant_list/");
+        const response = await fetch("https://deltapi.website:444/etudiant_list/");
         if (response.ok) {
           const updatedStudents = await response.json();
           setStudents(updatedStudents);
@@ -489,7 +489,7 @@ function Students() {
         onConfirm={async () => {
           try {
             await axios.delete(
-              `http://167.114.0.177:81/etudiants/delete/${studentToDelete}/`,
+              `https://deltapi.website:444/etudiants/delete/${studentToDelete}/`,
               {
                 headers: {
                   "Content-Type": "application/json",

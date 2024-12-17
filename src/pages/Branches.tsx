@@ -166,7 +166,7 @@ function Branches() {
   ];
 
   useEffect(() => {
-    fetch("http://167.114.0.177:81/filiere_list/")
+    fetch("https://deltapi.website:444/filiere_list/")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -384,7 +384,7 @@ function Branches() {
         onConfirm={async () => {
           try {
             await axios.delete(
-              `http://167.114.0.177:81/filieres/delete/${branchToDelete}/`,
+              `https://deltapi.website:444/filieres/delete/${branchToDelete}/`,
               {
                 headers: {
                   "Content-Type": "application/json",

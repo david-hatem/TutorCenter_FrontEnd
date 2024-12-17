@@ -129,7 +129,7 @@ function BankWithdrawals() {
     // Fetch data from the API
     const fetchData = async () => {
       try {
-        const response = await fetch("http://167.114.0.177:81/sorties-banque/");
+        const response = await fetch("https://deltapi.website:444/sorties-banque/");
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -348,7 +348,7 @@ function BankWithdrawals() {
         onConfirm={async () => {
           try {
             await axios.delete(
-              `http://167.114.0.177:81/sorties-banque/${branchToDelete}/`,
+              `https://deltapi.website:444/sorties-banque/${branchToDelete}/`,
               {
                 headers: {
                   "Content-Type": "application/json",

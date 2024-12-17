@@ -69,7 +69,7 @@ function TeacherDetails() {
 
       try {
         const response = await fetch(
-          `http://167.114.0.177:81/professeurs/${id}/details/`
+          `https://deltapi.website:444/professeurs/${id}/details/`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch student details");

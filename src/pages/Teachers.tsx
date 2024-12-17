@@ -115,7 +115,7 @@ function Teachers() {
   ];
 
   useEffect(() => {
-    fetch("http://167.114.0.177:81/professeur_list/")
+    fetch("https://deltapi.website:444/professeur_list/")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -187,7 +187,7 @@ function Teachers() {
       const createdTch = await createTeacher(submissionData);
       if (createdTch) {
         // Fetch fresh list of teachers
-        const response = await fetch("http://167.114.0.177:81/professeur_list/");
+        const response = await fetch("https://deltapi.website:444/professeur_list/");
         if (response.ok) {
           const updatedTeachers = await response.json();
           setTeachers(updatedTeachers);
@@ -362,7 +362,7 @@ function Teachers() {
         onConfirm={async () => {
           try {
             await axios.delete(
-              `http://167.114.0.177:81/professeurs/delete/${teacherToDelete}/`,
+              `https://deltapi.website:444/professeurs/delete/${teacherToDelete}/`,
               {
                 headers: {
                   "Content-Type": "application/json",

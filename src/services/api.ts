@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Bounce, toast } from "react-toastify";
 
-const API_BASE_URL = "http://167.114.0.177:81";
+const API_BASE_URL = "https://deltapi.website:444";
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -36,7 +36,7 @@ export const teachersApi = {
 // export const fetchMonthFinance = async () => {
 //   try {
 //     const response = await axios.get(
-//       "167.114.0.177:81/dashboard/financial-metrics/"
+//       "https://167.114.0.177:444/dashboard/financial-metrics/"
 //     );
 //     if (response.status === 200) {
 //       return response.data;
@@ -53,7 +53,7 @@ export const teachersApi = {
 // export const fetchWeekFinance = async () => {
 //   try {
 //     const response = await axios.get(
-//       "167.114.0.177:81/dashboard/weekly-financial-metrics/"
+//       "https://167.114.0.177:444/dashboard/weekly-financial-metrics/"
 //     );
 //     if (response.status === 200) {
 //       return response.data;
@@ -69,7 +69,7 @@ export const teachersApi = {
 
 export const fetchGroupeList = async () => {
   try {
-    const response = await axios.get("http://167.114.0.177:81/groupe_list/");
+    const response = await axios.get(`${API_BASE_URL}/groupe_list/`);
     if (response.status === 200) {
       return response.data;
     } else {
@@ -84,7 +84,7 @@ export const fetchGroupeList = async () => {
 
 export const fetchFiliereList = async () => {
   try {
-    const response = await axios.get("http://167.114.0.177:81/filiere_list/");
+    const response = await axios.get(`${API_BASE_URL}/filiere_list/`);
     if (response.status === 200) {
       return response.data;
     } else {
@@ -99,7 +99,7 @@ export const fetchFiliereList = async () => {
 
 export const fetchNiveauList = async () => {
   try {
-    const response = await axios.get("http://167.114.0.177:81/niveau_list/");
+    const response = await axios.get(`${API_BASE_URL}/niveau_list/`);
     if (response.status === 200) {
       return response.data;
     } else {
@@ -114,7 +114,7 @@ export const fetchNiveauList = async () => {
 
 export const fetchMatiereList = async () => {
   try {
-    const response = await axios.get("http://167.114.0.177:81/matiere_list/");
+    const response = await axios.get(`${API_BASE_URL}/matiere_list/`);
     if (response.status === 200) {
       return response.data;
     } else {
@@ -129,9 +129,7 @@ export const fetchMatiereList = async () => {
 
 export const fetchTeachersList = async () => {
   try {
-    const response = await axios.get(
-      "http://167.114.0.177:81/professeur_list/"
-    );
+    const response = await axios.get(`${API_BASE_URL}/professeur_list/`);
     if (response.status === 200) {
       return response.data;
     } else {
@@ -146,15 +144,11 @@ export const fetchTeachersList = async () => {
 
 export const createGroup = async (groupData) => {
   try {
-    const response = await axios.post(
-      "http://167.114.0.177:81/groupes/create/",
-      groupData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/groupes/create/`, groupData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.status === 201) {
       console.log("Group created successfully:", response.data);
       toast.success("Group created successfully", {
@@ -192,15 +186,11 @@ export const createGroup = async (groupData) => {
 
 export const updateGroup = async (groupData, id) => {
   try {
-    const response = await axios.put(
-      `http://167.114.0.177:81/groupes/update/${id}`,
-      groupData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.put(`${API_BASE_URL}/groupes/update/${id}`, groupData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.statusText === "OK") {
       console.log("Group Updated successfully:", response.data);
       toast.success("Group updated successfully", {
@@ -238,15 +228,11 @@ export const updateGroup = async (groupData, id) => {
 
 export const createStudent = async (groupData) => {
   try {
-    const response = await axios.post(
-      "http://167.114.0.177:81/etudiants/create/",
-      groupData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/etudiants/create/`, groupData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.status === 201) {
       console.log("Etudiants created successfully:", response.data);
       toast.success("Etudiants created successfully", {
@@ -284,15 +270,11 @@ export const createStudent = async (groupData) => {
 
 export const updateStudent = async (groupData, id) => {
   try {
-    const response = await axios.put(
-      `http://167.114.0.177:81/etudiants/update/${id}`,
-      groupData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.put(`${API_BASE_URL}/etudiants/update/${id}`, groupData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.statusText === "OK") {
       toast.success("Etudiants updated successfully", {
         position: "top-right",
@@ -330,15 +312,11 @@ export const updateStudent = async (groupData, id) => {
 
 export const addStudentGrp = async (groupData) => {
   try {
-    const response = await axios.post(
-      `http://167.114.0.177:81/etudiants/add-to-group/`,
-      groupData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/etudiants/add-to-group/`, groupData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.status === 201) {
       toast.success("Created successfully", {
         position: "top-right",
@@ -387,15 +365,11 @@ export const addStudentGrp = async (groupData) => {
 
 export const createTeacher = async (groupData) => {
   try {
-    const response = await axios.post(
-      "http://167.114.0.177:81/professeurs/create/",
-      groupData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/professeurs/create/`, groupData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.status === 201) {
       toast.success("Professeurs created successfully", {
         position: "top-right",
@@ -433,15 +407,11 @@ export const createTeacher = async (groupData) => {
 
 export const updateTeacher = async (groupData, id) => {
   try {
-    const response = await axios.put(
-      `http://167.114.0.177:81/professeurs/update/${id}`,
-      groupData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.put(`${API_BASE_URL}/professeurs/update/${id}`, groupData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.statusText === "OK") {
       toast.success("Professeurs updated successfully", {
         position: "top-right",
@@ -479,15 +449,11 @@ export const updateTeacher = async (groupData, id) => {
 
 export const createPayment = async (payData) => {
   try {
-    const response = await axios.post(
-      "http://167.114.0.177:81/payments/create/",
-      payData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/payments/create/`, payData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.status === 201) {
       toast.success("Payment created successfully", {
         position: "top-right",
@@ -525,15 +491,11 @@ export const createPayment = async (payData) => {
 
 export const updatePayment = async (payData, id) => {
   try {
-    const response = await axios.put(
-      `http://167.114.0.177:81/payments/${id}/update/`,
-      payData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.put(`${API_BASE_URL}/payments/${id}/update/`, payData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.statusText === "OK") {
       toast.success("Payment updated successfully", {
         position: "top-right",
@@ -571,15 +533,11 @@ export const updatePayment = async (payData, id) => {
 
 export const createLevel = async (levData) => {
   try {
-    const response = await axios.post(
-      "http://167.114.0.177:81/niveaux/create/",
-      levData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/niveaux/create/`, levData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.status === 201) {
       toast.success("Level created successfully", {
         position: "top-right",
@@ -616,15 +574,11 @@ export const createLevel = async (levData) => {
 };
 export const updateLevel = async (levData, id) => {
   try {
-    const response = await axios.put(
-      `http://167.114.0.177:81/niveaux/update/${id}`,
-      levData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.put(`${API_BASE_URL}/niveaux/update/${id}`, levData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.statusText === "OK") {
       toast.success("Level updated successfully", {
         position: "top-right",
@@ -659,15 +613,11 @@ export const updateLevel = async (levData, id) => {
 
 export const createBranch = async (branchData) => {
   try {
-    const response = await axios.post(
-      "http://167.114.0.177:81/filieres/create/",
-      branchData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/filieres/create/`, branchData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.status === 201) {
       toast.success("Branch created successfully", {
         position: "top-right",
@@ -705,15 +655,11 @@ export const createBranch = async (branchData) => {
 
 export const updateBranch = async (branchData, id) => {
   try {
-    const response = await axios.put(
-      `http://167.114.0.177:81/filieres/update/${id}`,
-      branchData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.put(`${API_BASE_URL}/filieres/update/${id}`, branchData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.statusText === "OK") {
       toast.success("Branch updated successfully", {
         position: "top-right",
@@ -751,15 +697,11 @@ export const updateBranch = async (branchData, id) => {
 
 export const createSub = async (subData) => {
   try {
-    const response = await axios.post(
-      "http://167.114.0.177:81/matieres/create/",
-      subData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/matieres/create/`, subData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.status === 201) {
       toast.success("Subject created successfully", {
         position: "top-right",
@@ -797,15 +739,11 @@ export const createSub = async (subData) => {
 
 export const updateSub = async (subData, id) => {
   try {
-    const response = await axios.put(
-      `http://167.114.0.177:81/matieres/update/${id}`,
-      subData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.put(`${API_BASE_URL}/matieres/update/${id}`, subData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.statusText === "OK") {
       toast.success("Subject updated successfully", {
         position: "top-right",
@@ -843,15 +781,11 @@ export const updateSub = async (subData, id) => {
 
 export const createDepenses = async (subData) => {
   try {
-    const response = await axios.post(
-      "http://167.114.0.177:81/depenses/",
-      subData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/depenses/`, subData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.status === 201) {
       toast.success("Depenses created successfully", {
         position: "top-right",
@@ -889,15 +823,11 @@ export const createDepenses = async (subData) => {
 
 export const updateDepenses = async (subData, id) => {
   try {
-    const response = await axios.put(
-      `http://167.114.0.177:81/depenses/${id}`,
-      subData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.put(`${API_BASE_URL}/depenses/${id}`, subData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.statusText === "OK") {
       toast.success("depenses updated successfully", {
         position: "top-right",
@@ -934,15 +864,11 @@ export const updateDepenses = async (subData, id) => {
 
 export const createSortiesBanque = async (subData) => {
   try {
-    const response = await axios.post(
-      "http://167.114.0.177:81/sorties-banque/",
-      subData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/sorties-banque/`, subData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.status === 201) {
       toast.success("SortiesBanque created successfully", {
         position: "top-right",
@@ -980,15 +906,11 @@ export const createSortiesBanque = async (subData) => {
 
 export const updateSortiesBanque = async (subData, id) => {
   try {
-    const response = await axios.put(
-      `http://167.114.0.177:81/sorties-banque/${id}`,
-      subData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await axios.put(`${API_BASE_URL}/sorties-banque/${id}`, subData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.statusText === "OK") {
       toast.success("SortiesBanque updated successfully", {
         position: "top-right",

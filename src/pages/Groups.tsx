@@ -669,7 +669,7 @@ function Groups() {
         onConfirm={async () => {
           try {
             await axios.delete(
-              `http://167.114.0.177:81/groupes/delete/${groupToDelete}/`,
+              `https://deltapi.website:444/groupes/delete/${groupToDelete}/`,
               {
                 headers: {
                   "Content-Type": "application/json",

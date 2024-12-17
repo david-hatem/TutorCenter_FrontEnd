@@ -74,7 +74,7 @@ function StudentDetails() {
 
     try {
       const response = await fetch(
-        `http://167.114.0.177:81/etudiants/${id}/details/`
+        `https://deltapi.website:444/etudiants/${id}/details/`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch student details");
@@ -342,7 +342,7 @@ function StudentDetails() {
       if (response) {
         // Fetch fresh student data after update
         const updatedResponse = await fetch(
-          `http://167.114.0.177:81/etudiants/${id}/details/`
+          `https://deltapi.website:444/etudiants/${id}/details/`
         );
         if (!updatedResponse.ok) {
           throw new Error("Failed to fetch updated student details");
