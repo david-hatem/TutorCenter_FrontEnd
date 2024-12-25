@@ -343,7 +343,7 @@ function StudentDetails() {
     );
   }
 
-  const handleAddPayment = async (paymentData: PaymentFormData) => {
+  const handleAddPayment = async (paymentData: PaymentFormData[]) => {
     try {
       setIsPaymentModalOpen(false);
       await fetchEtudiantDetails(); // Refresh student data after payment
@@ -662,6 +662,7 @@ function StudentDetails() {
           groups={student.groupes}
           fetch={fetchEtudiantDetails}
           fetch2={fetchEtudiantDetails}
+          isCompletion={false}
         />
       </Modal>
 

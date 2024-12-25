@@ -37,7 +37,7 @@ function PaymentForm({
       etudiant_id: initialStudentId || 0,
       groupe_id: groups[0]?.id || 0,
       commission_percentage: 100,
-      professeurs: [], // Will be set in the parent component for completion payments
+      professeurs: groups[0]?.professeurs?.map(p => p.id) || [],
     },
   ]);
 
@@ -134,12 +134,9 @@ function PaymentForm({
         fetch();
         fetch2();
 
-        // Log the response to see its structure
-        console.log('Created payment response:', createdPay);
-
         // Process each payment in the response
         createdPay.forEach((paymentResponse) => {
-          const payment = paymentResponse.payment; // Get the payment object from the response
+          const payment = paymentResponse.payment;
           const printWindow = window.open("", "_blank");
           if (!printWindow) return;
 
@@ -263,7 +260,7 @@ function PaymentForm({
             etudiant_id: initialStudentId || 0,
             groupe_id: groups[0]?.id || 0,
             commission_percentage: 100,
-            professeurs: [],
+            professeurs: groups[0]?.professeurs?.map(p => p.id) || [],
           },
         ];
       }
@@ -275,7 +272,7 @@ function PaymentForm({
           etudiant_id: initialStudentId || 0,
           groupe_id: groups[0]?.id || 0,
           commission_percentage: 100,
-          professeurs: [],
+          professeurs: groups[0]?.professeurs?.map(p => p.id) || [],
         },
       ];
     });
@@ -302,7 +299,21 @@ function PaymentForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {formData.map((payment, index) => (
-        <div key={index} className="space-y-4">
+        <div key={index} className="p-4 border rounded-lg bg-white shadow-sm space-y-4">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg font-medium text-gray-900">Paiement {index + 1}</h3>
+            {formData.length > 1 && (
+              <button
+                type="button"
+                onClick={() => handleRemoveField(index)}
+                className="text-red-600 hover:text-red-700 flex items-center"
+              >
+                <Minus className="h-4 w-4 mr-1" />
+                Supprimer
+              </button>
+            )}
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Montant {isCompletion ? "restant" : ""} (MAD)
@@ -353,31 +364,6 @@ function PaymentForm({
                     {errors.frais_inscription}
                   </p>
                 )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Étudiant
-                </label>
-                <select
-                  value={payment.etudiant_id}
-                  onChange={(e) =>
-                    handleFieldChange(
-                      index,
-                      "etudiant_id",
-                      parseInt(e.target.value)
-                    )
-                  }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  required
-                >
-                  <option value="">Sélectionner un étudiant</option>
-                  {students.map((student) => (
-                    <option key={student.id} value={student.id}>
-                      {student.prenom} {student.nom}
-                    </option>
-                  ))}
-                </select>
               </div>
 
               <div>
@@ -450,7 +436,18 @@ function PaymentForm({
         </div>
       ))}
 
-      <div className="flex justify-end space-x-2">
+      {!isCompletion && (
+        <button
+          type="button"
+          onClick={handleAddField}
+          className="w-full mt-4 flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Ajouter un autre paiement
+        </button>
+      )}
+
+      <div className="flex justify-end space-x-2 mt-6">
         <button
           type="button"
           onClick={onClose}
