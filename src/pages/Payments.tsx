@@ -5,7 +5,152 @@ import Modal from "../components/Modal";
 import PaymentForm from "../components/PaymentForm";
 import { ColumnDef } from "@tanstack/react-table";
 import { Printer, PlusCircle } from "lucide-react";
-import type { Payment, PaymentFormData } from "../types";
+import type { Payment, PaymentFormData, Group } from "../types";
+import { fetchGroupeList } from "../services/api";
+
+interface FiltersProps {
+  groups: Group[];
+  students: any[];
+  filters: {
+    groupId: number;
+    studentId: number;
+    filiereId: number;
+    niveauId: number;
+    startDate: string;
+    endDate: string;
+  };
+  onFilterChange: (filters: any) => void;
+}
+
+function Filters({ groups, students, filters, onFilterChange }: FiltersProps) {
+  // Get unique filieres and niveaux from groups
+  const filieres = Array.from(new Set(groups.map(g => g.filiere?.id))).map(id => ({
+    id,
+    nom_filiere: groups.find(g => g.filiere?.id === id)?.filiere?.nom_filiere
+  })).filter(f => f.id && f.nom_filiere);
+
+  const niveaux = Array.from(new Set(groups.map(g => g.niveau?.id))).map(id => ({
+    id,
+    nom_niveau: groups.find(g => g.niveau?.id === id)?.niveau?.nom_niveau
+  })).filter(n => n.id && n.nom_niveau);
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Filière
+        </label>
+        <select
+          className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          value={filters.filiereId || ""}
+          onChange={(e) =>
+            onFilterChange({ ...filters, filiereId: Number(e.target.value) || 0, groupId: 0 })
+          }
+        >
+          <option value="">Toutes les filières</option>
+          {filieres.map((filiere) => (
+            <option key={filiere.id} value={filiere.id}>
+              {filiere.nom_filiere}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Niveau
+        </label>
+        <select
+          className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          value={filters.niveauId || ""}
+          onChange={(e) =>
+            onFilterChange({ ...filters, niveauId: Number(e.target.value) || 0, groupId: 0 })
+          }
+        >
+          <option value="">Tous les niveaux</option>
+          {niveaux.map((niveau) => (
+            <option key={niveau.id} value={niveau.id}>
+              {niveau.nom_niveau}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Étudiant
+        </label>
+        <select
+          className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          value={filters.studentId || ""}
+          onChange={(e) =>
+            onFilterChange({ ...filters, studentId: Number(e.target.value) || 0 })
+          }
+        >
+          <option value="">Tous les étudiants</option>
+          {students.map((student) => (
+            <option key={student.id} value={student.id}>
+              {student.prenom} {student.nom}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Groupe
+        </label>
+        <select
+          className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          value={filters.groupId || ""}
+          onChange={(e) =>
+            onFilterChange({ ...filters, groupId: Number(e.target.value) || 0 })
+          }
+        >
+          <option value="">Tous les groupes</option>
+          {groups
+            .filter(group => 
+              (!filters.filiereId || group.filiere?.id === filters.filiereId) &&
+              (!filters.niveauId || group.niveau?.id === filters.niveauId)
+            )
+            .map((group) => (
+              <option key={group.id} value={group.id}>
+                {group.nom_groupe}
+              </option>
+            ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Date début
+        </label>
+        <input
+          type="date"
+          className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          value={filters.startDate}
+          onChange={(e) =>
+            onFilterChange({ ...filters, startDate: e.target.value })
+          }
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Date fin
+        </label>
+        <input
+          type="date"
+          className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          value={filters.endDate}
+          onChange={(e) =>
+            onFilterChange({ ...filters, endDate: e.target.value })
+          }
+        />
+      </div>
+    </div>
+  );
+}
 
 const columns: ColumnDef<Payment>[] = [
   {
@@ -250,6 +395,17 @@ function Payments() {
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [payments, setPayments] = useState([]);
+  const [filteredPayments, setFilteredPayments] = useState([]);
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [students, setStudents] = useState([]);
+  const [filters, setFilters] = useState({
+    groupId: 0,
+    studentId: 0,
+    filiereId: 0,
+    niveauId: 0,
+    startDate: "",
+    endDate: "",
+  });
   const [totalAmount, setTotalAmount] = useState(
     initialData.reduce((sum, payment) => sum + payment.montant, 0)
   );
@@ -265,6 +421,19 @@ function Payments() {
       }
       const data = await response.json();
       setPayments(data.results);
+      
+      // Extract unique students from payments
+      const uniqueStudents = Array.from(
+        new Map(
+          data.results.map((payment) => [
+            payment.etudiant.id,
+            payment.etudiant,
+          ])
+        ).values()
+      );
+      setStudents(uniqueStudents);
+      
+      // Calculate total amount from filtered payments
       setTotalAmount(data.results.reduce((sum, p) => sum + p.montant, 0));
     } catch (err) {
       console.error("Error fetching payments:", err);
@@ -275,7 +444,73 @@ function Payments() {
 
   useEffect(() => {
     fetchPayments();
+    
+    // Fetch groups
+    const getGroups = async () => {
+      try {
+        const groupsData = await fetchGroupeList();
+        setGroups(groupsData);
+      } catch (error) {
+        console.error("Error fetching groups:", error);
+      }
+    };
+    getGroups();
   }, []);
+
+  const handleFilterChange = (newFilters: typeof filters) => {
+    setFilters(newFilters);
+
+    // Apply filters
+    let filtered = [...payments];
+
+    if (newFilters.filiereId) {
+      filtered = filtered.filter(
+        (payment) => payment.groupe.filiere?.id === newFilters.filiereId
+      );
+    }
+
+    if (newFilters.niveauId) {
+      filtered = filtered.filter(
+        (payment) => payment.groupe.niveau?.id === newFilters.niveauId
+      );
+    }
+
+    if (newFilters.studentId) {
+      filtered = filtered.filter(
+        (payment) => payment.etudiant.id === newFilters.studentId
+      );
+    }
+
+    if (newFilters.groupId) {
+      filtered = filtered.filter(
+        (payment) => payment.groupe.id === newFilters.groupId
+      );
+    }
+
+    if (newFilters.startDate) {
+      filtered = filtered.filter(
+        (payment) =>
+          new Date(payment.date_paiement) >= new Date(newFilters.startDate)
+      );
+    }
+
+    if (newFilters.endDate) {
+      filtered = filtered.filter(
+        (payment) =>
+          new Date(payment.date_paiement) <= new Date(newFilters.endDate)
+      );
+    }
+
+    // Add action handlers to each payment
+    const enhancedPayments = filtered.map(payment => ({
+      ...payment,
+      onPrint: () => handlePrint(payment),
+      onCompletePayment: () => handleCompletePayment(payment)
+    }));
+
+    setFilteredPayments(enhancedPayments);
+    setTotalAmount(filtered.reduce((sum, p) => sum + p.montant, 0));
+  };
 
   const handlePrint = (payment: Payment) => {
     setSelectedPayment(payment);
@@ -283,11 +518,19 @@ function Payments() {
   };
 
   const handleCompletePayment = (payment: Payment) => {
-    if (!payment.montant_total) return;
-
     setSelectedPayment(payment);
     setIsModalOpen(true);
   };
+
+  // Add action handlers when payments are fetched
+  useEffect(() => {
+    const enhancedPayments = payments.map(payment => ({
+      ...payment,
+      onPrint: () => handlePrint(payment),
+      onCompletePayment: () => handleCompletePayment(payment)
+    }));
+    setFilteredPayments(enhancedPayments);
+  }, [payments]);
 
   const handleCreatePayment = async (paymentData: PaymentFormData) => {
     try {
@@ -296,10 +539,20 @@ function Payments() {
       const remainingAmount =
         selectedPayment.montant_total - selectedPayment.montant;
 
-      if (paymentData.montant > remainingAmount) {
-        alert(`The maximum remaining amount is $${remainingAmount}`);
+      if (paymentData[0].montant > remainingAmount) {
+        alert(`Le montant maximum restant est ${remainingAmount} MAD`);
         return;
       }
+
+      // Prepare the payment data
+      const completionPayment = {
+        payments: [{
+          ...paymentData[0],
+          etudiant_id: selectedPayment.etudiant.id,
+          groupe_id: selectedPayment.groupe.id,
+          professeurs: selectedPayment.groupe.professeurs.map(p => p.id)
+        }]
+      };
 
       // Create new payment through API
       const response = await fetch(
@@ -309,28 +562,22 @@ function Payments() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(paymentData),
+          body: JSON.stringify(completionPayment),
         }
       );
 
       if (response.ok) {
         // Fetch updated payments list
-        const updatedResponse = await fetch(
-          "https://deltapi.website:444/paiements/"
-        );
-        const data = await updatedResponse.json();
-
-        setPayments(data.results);
-        setTotalAmount(data.results.reduce((sum, p) => sum + p.montant, 0));
+        fetchPayments();
         setIsModalOpen(false);
         setSelectedPayment(null);
-        alert("Payment completed successfully");
       } else {
-        throw new Error("Failed to create payment");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to create payment");
       }
     } catch (error) {
       console.error("Error creating payment:", error);
-      alert("Failed to complete payment");
+      alert("Failed to complete payment: " + (error.message || "Unknown error"));
     }
   };
 
@@ -392,12 +639,6 @@ function Payments() {
     }, 250);
   };
 
-  const paymentsWithActions = payments.map((payment) => ({
-    ...payment,
-    onPrint: handlePrint,
-    onCompletePayment: handleCompletePayment,
-  }));
-
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -419,10 +660,18 @@ function Payments() {
             Add Payment
           </button>
         </div>
+
+        <Filters
+          groups={groups}
+          students={students}
+          filters={filters}
+          onFilterChange={handleFilterChange}
+        />
+
         <div className="bg-white rounded-lg shadow p-6">
           <DataTable
             columns={columns}
-            data={paymentsWithActions}
+            data={filteredPayments}
             searchPlaceholder="Search payments..."
           />
         </div>

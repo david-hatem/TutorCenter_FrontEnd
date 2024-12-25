@@ -16,6 +16,8 @@ interface FiltersProps {
   filters: {
     groupId: number;
     teacherId: number;
+    filiereId: number;
+    niveauId: number;
     startDate: string;
     endDate: string;
   };
@@ -23,11 +25,62 @@ interface FiltersProps {
 }
 
 function Filters({ groups, teachers, filters, onFilterChange }: FiltersProps) {
+  // Get unique filieres and niveaux from groups
+  const filieres = Array.from(new Set(groups.map(g => g.filiere?.id))).map(id => ({
+    id,
+    nom_filiere: groups.find(g => g.filiere?.id === id)?.filiere?.nom_filiere
+  })).filter(f => f.id && f.nom_filiere);
+
+  const niveaux = Array.from(new Set(groups.map(g => g.niveau?.id))).map(id => ({
+    id,
+    nom_niveau: groups.find(g => g.niveau?.id === id)?.niveau?.nom_niveau
+  })).filter(n => n.id && n.nom_niveau);
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Group
+          Filière
+        </label>
+        <select
+          className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          value={filters.filiereId || ""}
+          onChange={(e) =>
+            onFilterChange({ ...filters, filiereId: Number(e.target.value) || 0, groupId: 0 })
+          }
+        >
+          <option value="">Toutes les filières</option>
+          {filieres.map((filiere) => (
+            <option key={filiere.id} value={filiere.id}>
+              {filiere.nom_filiere}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Niveau
+        </label>
+        <select
+          className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          value={filters.niveauId || ""}
+          onChange={(e) =>
+            onFilterChange({ ...filters, niveauId: Number(e.target.value) || 0, groupId: 0 })
+          }
+        >
+          <option value="">Tous les niveaux</option>
+          {niveaux.map((niveau) => (
+            <option key={niveau.id} value={niveau.id}>
+              {niveau.nom_niveau}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Groupe
         </label>
         <select
           className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -36,18 +89,23 @@ function Filters({ groups, teachers, filters, onFilterChange }: FiltersProps) {
             onFilterChange({ ...filters, groupId: Number(e.target.value) || 0 })
           }
         >
-          <option value="">All Groups</option>
-          {groups.map((group) => (
-            <option key={group.id} value={group.id}>
-              {group.nom_groupe}
-            </option>
-          ))}
+          <option value="">Tous les groupes</option>
+          {groups
+            .filter(group => 
+              (!filters.filiereId || group.filiere?.id === filters.filiereId) &&
+              (!filters.niveauId || group.niveau?.id === filters.niveauId)
+            )
+            .map((group) => (
+              <option key={group.id} value={group.id}>
+                {group.nom_groupe}
+              </option>
+            ))}
         </select>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Teacher
+          Professeur
         </label>
         <select
           className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -59,7 +117,7 @@ function Filters({ groups, teachers, filters, onFilterChange }: FiltersProps) {
             })
           }
         >
-          <option value="">All Teachers</option>
+          <option value="">Tous les professeurs</option>
           {teachers.map((teacher) => (
             <option key={teacher.id} value={teacher.id}>
               {teacher.prenom} {teacher.nom}
@@ -70,7 +128,7 @@ function Filters({ groups, teachers, filters, onFilterChange }: FiltersProps) {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Start Date
+          Date début
         </label>
         <input
           type="date"
@@ -84,7 +142,7 @@ function Filters({ groups, teachers, filters, onFilterChange }: FiltersProps) {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          End Date
+          Date fin
         </label>
         <input
           type="date"
@@ -311,6 +369,18 @@ function PrintableCommissions({
       <div className="mb-6">
         <h2 className="text-lg font-semibold mb-2">Filters Applied</h2>
         <div className="space-y-1 text-sm">
+          {filters.filiereId && (
+            <p>
+              Filière:{" "}
+              {sampleGroups.find((g) => g.filiere?.id === filters.filiereId)?.filiere?.nom_filiere}
+            </p>
+          )}
+          {filters.niveauId && (
+            <p>
+              Niveau:{" "}
+              {sampleGroups.find((g) => g.niveau?.id === filters.niveauId)?.niveau?.nom_niveau}
+            </p>
+          )}
           {filters.groupId && (
             <p>
               Group:{" "}
@@ -408,6 +478,8 @@ function Commissions() {
   const [filters, setFilters] = useState({
     groupId: 0,
     teacherId: 0,
+    filiereId: 0,
+    niveauId: 0,
     startDate: "",
     endDate: "",
   });
@@ -457,6 +529,18 @@ function Commissions() {
 
     // Apply filters
     let filtered = [...commissions];
+
+    if (newFilters.filiereId) {
+      filtered = filtered.filter(
+        (commission) => commission.groupe.filiere === newFilters.filiereId
+      );
+    }
+
+    if (newFilters.niveauId) {
+      filtered = filtered.filter(
+        (commission) => commission.groupe.niveau === newFilters.niveauId
+      );
+    }
 
     if (newFilters.groupId) {
       filtered = filtered.filter(

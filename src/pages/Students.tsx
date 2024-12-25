@@ -120,6 +120,7 @@ interface StudentFormData {
   nationalite?: string;
   contact_urgence?: string;
   groupe_id: number;
+  etablissement?: string; // Add the new field
 }
 
 function Students() {
@@ -257,6 +258,7 @@ function Students() {
       nationalite: "",
       contact_urgence: "",
       groupe_id: 0,
+      etablissement: "", // Add the new field
     });
 
     const [groups, setGroups] = useState([]);
@@ -412,6 +414,19 @@ function Students() {
             value={formData.contact_urgence}
             onChange={(e) =>
               setFormData({ ...formData, contact_urgence: e.target.value })
+            }
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Établissement
+          </label>
+          <input
+            type="text"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            value={formData.etablissement}
+            onChange={(e) =>
+              setFormData({ ...formData, etablissement: e.target.value })
             }
           />
         </div>

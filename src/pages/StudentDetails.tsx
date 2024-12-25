@@ -54,6 +54,7 @@ interface StudentDetails {
   }[];
   total_paiements: number;
   total_groupes: number;
+  etablissement: string;
 }
 
 function StudentDetails() {
@@ -129,6 +130,7 @@ function StudentDetails() {
     nationalite: string;
     contact_urgence: string;
     groupe_id: number;
+    etablissement: string;
   }
 
   function EditStudentForm({
@@ -148,6 +150,7 @@ function StudentDetails() {
       nationalite: student?.nationalite,
       contact_urgence: student?.contact_urgence,
       groupe_id: student?.groupes[0].id,
+      etablissement: student?.etablissement,
     });
 
     const [groups, setGroups] = useState([]);
@@ -284,6 +287,19 @@ function StudentDetails() {
             defaultValue={formData?.contact_urgence}
             onChange={(e) =>
               setFormData({ ...formData, contact_urgence: e.target.value })
+            }
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Établissement
+          </label>
+          <input
+            type="text"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            defaultValue={formData?.etablissement}
+            onChange={(e) =>
+              setFormData({ ...formData, etablissement: e.target.value })
             }
           />
         </div>
@@ -464,6 +480,10 @@ function StudentDetails() {
             <div>
               <label className="text-sm text-gray-500">Contact d'urgence</label>
               <p className="font-medium">{student.contact_urgence}</p>
+            </div>
+            <div>
+              <label className="text-sm text-gray-500">Établissement</label>
+              <p className="font-medium">{student.etablissement}</p>
             </div>
           </div>
         </div>
