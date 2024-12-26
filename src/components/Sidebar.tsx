@@ -31,8 +31,18 @@ const menuItems = [
 function Sidebar() {
   return (
     <aside className="w-64 bg-white border-r border-gray-200">
-      <div className="p-6">
-        <h1 className="text-2xl font-bold text-gray-800">Delta Institut</h1>
+      <div className="p-6 bg-gradient-to-r from-blue-600 to-indigo-600">
+        <div className="flex items-center justify-center space-x-2">
+          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+            <span className="text-2xl font-bold text-blue-600">D</span>
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-white tracking-wider">
+              DELTA
+              <span className="block text-sm font-medium text-blue-100 tracking-wide">INSTITUT</span>
+            </h1>
+          </div>
+        </div>
       </div>
       <nav className="mt-6">
         {menuItems.map((item) => (
