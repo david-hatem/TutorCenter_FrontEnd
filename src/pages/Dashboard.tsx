@@ -17,7 +17,10 @@ import {
   CartesianGrid, 
   Tooltip, 
   Legend, 
-  ResponsiveContainer
+  ResponsiveContainer,
+  PieChart, 
+  Pie, 
+  Cell
 } from 'recharts';
 
 // Metric card component
@@ -104,7 +107,8 @@ const SimplePieChart = ({
 
 function Dashboard() {
   const [metrics, setMetrics] = useState<any>(null);
-  const [financialData, setFinancialData] = useState<any[]>([]);
+  const [paymentsData, setPaymentsData] = useState<any[]>([]);
+  const [expensesData, setExpensesData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -122,13 +126,21 @@ function Dashboard() {
         const metricsData = await metricsResponse.json();
         setMetrics(metricsData);
 
-        // Fetch financial metrics
-        const financialResponse = await fetch('https://deltapi.website:444/dashboard/financial-metrics/');
-        if (!financialResponse.ok) {
-          throw new Error(`Erreur de chargement des métriques financières: ${financialResponse.status}`);
+        // Fetch payments and commissions
+        const paymentsResponse = await fetch('https://deltapi.website:444/dashboard/paiement-commissions-by-month/');
+        if (!paymentsResponse.ok) {
+          throw new Error(`Erreur de chargement des paiements: ${paymentsResponse.status}`);
         }
-        const financialData = await financialResponse.json();
-        setFinancialData(financialData.data);
+        const paymentsData = await paymentsResponse.json();
+        setPaymentsData(paymentsData.data);
+
+        // Fetch expenses and bank withdrawals
+        const expensesResponse = await fetch('https://deltapi.website:444/dashboard/depenses-sortiebanque-by-months/');
+        if (!expensesResponse.ok) {
+          throw new Error(`Erreur de chargement des dépenses: ${expensesResponse.status}`);
+        }
+        const expensesData = await expensesResponse.json();
+        setExpensesData(expensesData.data);
 
         setIsLoading(false);
       } catch (error) {
@@ -201,39 +213,6 @@ function Dashboard() {
     return <LoadingDisplay />;
   }
 
-  // Prepare data for pie charts
-  const teacherSpecialtyData = metrics.teacher_metrics.teachers_by_specialite
-    .map(spec => ({ 
-      name: spec.specialite, 
-      value: spec.count 
-    }));
-
-  const paymentStatusData = metrics.payment_metrics.payment_status
-    .map(status => ({ 
-      name: status.statut_paiement, 
-      value: status.count 
-    }));
-
-  // Extensive debugging for financial data
-  console.log('Raw Financial Data:', JSON.stringify(financialData, null, 2));
-
-  // Modify the financial data mapping with extensive logging
-  const transformedFinancialData = financialData.map((item, index) => {
-    console.log(`Item ${index}:`, JSON.stringify(item, null, 2));
-    console.log('Keys:', Object.keys(item));
-    
-    return {
-      name: item.name,
-      depenses: item.depenses || 0,
-      'sorties-banque': item['sorties-banque'] || 0,
-      recettes: item.recettes || 0
-    };
-  });
-
-  console.log('Transformed Financial Data:', 
-    JSON.stringify(transformedFinancialData, null, 2)
-  );
-
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Tableau de Bord</h1>
@@ -269,80 +248,227 @@ function Dashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-        {/* Teacher Specialties */}
-        <SimplePieChart 
-          title="Spécialités des Professeurs" 
-          data={teacherSpecialtyData} 
-        />
-
-        {/* Payment Status */}
-        <SimplePieChart 
-          title="Statut des Paiements" 
-          data={paymentStatusData} 
-        />
-
-        {/* Financial Metrics */}
-        <div className="bg-white shadow-md rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-4 text-gray-700">Métriques Financières Annuelles</h3>
-          <ResponsiveContainer width="100%" height={350}>
-            <BarChart data={transformedFinancialData}>
-              <CartesianGrid 
-                stroke="#f5f5f5" 
-                strokeDasharray="3 3" 
-              />
-              <XAxis 
-                dataKey="name" 
-                tick={{fill: '#6B7280', fontSize: 12}}
-              />
-              <YAxis 
-                tick={{fill: '#6B7280', fontSize: 12}} 
-                tickFormatter={(value) => `${value.toLocaleString()} MAD`}
-              />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'white', 
-                  border: '1px solid #E5E7EB', 
-                  borderRadius: '8px'
+      {/* Financial Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Payments and Commissions Chart */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-lg font-semibold mb-4">Paiements et Commissions</h2>
+          <div className="h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={paymentsData}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
                 }}
-                labelStyle={{fontWeight: 'bold', color: '#1F2937'}}
-                formatter={(value, name) => {
-                  console.log('Tooltip Debug - Value:', value, 'Name:', name);
-                  return [
-                    `${Number(value).toLocaleString()} MAD`, 
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                  }}
+                  formatter={(value) => `${value.toLocaleString()} MAD`}
+                />
+                <Legend />
+                <Bar 
+                  dataKey="paiements" 
+                  name="Paiements" 
+                  fill="#4F46E5" 
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar 
+                  dataKey="commissions" 
+                  name="Commissions" 
+                  fill="#10B981" 
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Expenses and Bank Withdrawals Chart */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-lg font-semibold mb-4">Dépenses et Sorties Bancaires</h2>
+          <div className="h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={expensesData}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                  }}
+                  formatter={(value) => `${value.toLocaleString()} MAD`}
+                />
+                <Legend />
+                <Bar 
+                  dataKey="depenses" 
+                  name="Dépenses" 
+                  fill="#EF4444" 
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar 
+                  dataKey="sorties-banque" 
+                  name="Sorties Bancaires" 
+                  fill="#F59E0B" 
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Metrics Pie Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Teacher Specialties Pie Chart */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-lg font-semibold mb-4">Spécialités des Professeurs</h2>
+          <div className="h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={metrics.teacher_metrics.teachers_by_specialite}
+                  dataKey="count"
+                  nameKey="specialite"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={150}
+                  fill="#8884d8"
+                  label={({
+                    cx,
+                    cy,
+                    midAngle,
+                    innerRadius,
+                    outerRadius,
+                    value,
                     name
-                  ];
-                }} 
-              />
-              <Legend 
-                verticalAlign="top" 
-                height={36}
-                iconType="circle"
-                formatter={(value) => {
-                  console.log('Legend Debug - Value:', value);
-                  return value;
-                }} 
-              />
-              <Bar 
-                dataKey="depenses" 
-                barSize={20} 
-                fill="#EF4444" 
-                name="Dépenses"
-              />
-              <Bar 
-                dataKey="sorties-banque" 
-                barSize={20} 
-                fill="#10B981" 
-                name="Sorties Bancaires"
-              />
-              <Bar 
-                dataKey="recettes" 
-                barSize={20} 
-                fill="#3B82F6" 
-                name="Recettes"
-              />
-            </BarChart>
-          </ResponsiveContainer>
+                  }) => {
+                    const RADIAN = Math.PI / 180;
+                    const radius = 25 + innerRadius + (outerRadius - innerRadius);
+                    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+                    return (
+                      <text
+                        x={x}
+                        y={y}
+                        fill="#4B5563"
+                        textAnchor={x > cx ? 'start' : 'end'}
+                        dominantBaseline="central"
+                        className="text-xs"
+                      >
+                        {name} ({value})
+                      </text>
+                    );
+                  }}
+                >
+                  {metrics.teacher_metrics.teachers_by_specialite.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={[
+                        '#4F46E5', '#10B981', '#F59E0B', '#EF4444', 
+                        '#6366F1', '#14B8A6', '#F97316', '#EC4899',
+                        '#8B5CF6', '#06B6D4', '#F43F5E', '#10B981',
+                        '#6366F1', '#14B8A6'
+                      ][index % 14]} 
+                    />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  formatter={(value, name) => [`${value} professeur${value > 1 ? 's' : ''}`, name]}
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Payment Status Pie Chart */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-lg font-semibold mb-4">Statut des Paiements</h2>
+          <div className="h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={metrics.payment_metrics.payment_status}
+                  dataKey="count"
+                  nameKey="statut_paiement"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={150}
+                  fill="#8884d8"
+                  label={({
+                    cx,
+                    cy,
+                    midAngle,
+                    innerRadius,
+                    outerRadius,
+                    value,
+                    name
+                  }) => {
+                    const RADIAN = Math.PI / 180;
+                    const radius = 25 + innerRadius + (outerRadius - innerRadius);
+                    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+                    return (
+                      <text
+                        x={x}
+                        y={y}
+                        fill="#4B5563"
+                        textAnchor={x > cx ? 'start' : 'end'}
+                        dominantBaseline="central"
+                        className="text-sm font-medium"
+                      >
+                        {name === 'PARTIAL' ? 'Partiel' : 'Payé'} ({value})
+                      </text>
+                    );
+                  }}
+                >
+                  <Cell fill="#F59E0B" /> {/* Orange for Partial */}
+                  <Cell fill="#10B981" /> {/* Green for Paid */}
+                </Pie>
+                <Tooltip 
+                  formatter={(value, name) => [
+                    `${value} paiement${value > 1 ? 's' : ''}`,
+                    name === 'PARTIAL' ? 'Partiel' : 'Payé'
+                  ]}
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
 
