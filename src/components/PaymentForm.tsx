@@ -295,6 +295,7 @@ function PaymentForm({
   };
 
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const [showInscription, setShowInscription] = useState(false);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -338,33 +339,56 @@ function PaymentForm({
 
           {!isCompletion && (
             <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Frais d'inscription (MAD)
-                </label>
-                <input
-                  type="number"
-                  value={payment.frais_inscription}
-                  onChange={(e) =>
-                    handleFieldChange(
-                      index,
-                      "frais_inscription",
-                      parseFloat(e.target.value)
-                    )
-                  }
-                  className={`mt-1 block w-full rounded-md shadow-sm ${
-                    errors.frais_inscription
-                      ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                      : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  }`}
-                  required
-                />
-                {errors.frais_inscription && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.frais_inscription}
-                  </p>
-                )}
-              </div>
+              {index === 0 && (
+                <div className="flex items-center mb-4">
+                  <input
+                    type="checkbox"
+                    id="show-inscription"
+                    checked={showInscription}
+                    onChange={(e) => {
+                      setShowInscription(e.target.checked);
+                      if (!e.target.checked) {
+                        // Reset inscription fee when unchecked
+                        handleFieldChange(index, "frais_inscription", 0);
+                      }
+                    }}
+                    className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  />
+                  <label htmlFor="show-inscription" className="ml-2 text-sm text-gray-700">
+                    Première inscription
+                  </label>
+                </div>
+              )}
+
+              {index === 0 && showInscription && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Frais d'inscription (MAD)
+                  </label>
+                  <input
+                    type="number"
+                    value={payment.frais_inscription}
+                    onChange={(e) =>
+                      handleFieldChange(
+                        index,
+                        "frais_inscription",
+                        parseFloat(e.target.value)
+                      )
+                    }
+                    className={`mt-1 block w-full rounded-md shadow-sm ${
+                      errors.frais_inscription
+                        ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    }`}
+                    required
+                  />
+                  {errors.frais_inscription && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.frais_inscription}
+                    </p>
+                  )}
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -405,24 +429,33 @@ function PaymentForm({
                   <div className="space-y-2">
                     {groups
                       .find((g) => g.id === payment.groupe_id)
-                      ?.professeurs.map((prof) => (
-                        <label
-                          key={prof.id}
-                          className="flex items-center space-x-2"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={payment.professeurs.includes(prof.id)}
-                            onChange={() =>
-                              handleProfesseurToggle(index, prof.id)
-                            }
-                            className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                          />
-                          <span>
-                            {prof.prenom} {prof.nom}
-                          </span>
-                        </label>
-                      ))}
+                      ?.professeurs.map((prof, profIndex) => {
+                        const currentGroup = groups.find((g) => g.id === payment.groupe_id);
+                        const matiere = currentGroup?.matieres[profIndex]?.nom_matiere;
+                        return (
+                          <label
+                            key={prof.id}
+                            className="flex items-center space-x-2"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={payment.professeurs.includes(prof.id)}
+                              onChange={() =>
+                                handleProfesseurToggle(index, prof.id)
+                              }
+                              className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            />
+                            <span>
+                              {prof.prenom} {prof.nom}
+                              {matiere && (
+                                <span className="text-gray-500 ml-1">
+                                  - {matiere}
+                                </span>
+                              )}
+                            </span>
+                          </label>
+                        );
+                      })}
                   </div>
                   {errors.professeurs && (
                     <p className="mt-1 text-sm text-red-600">

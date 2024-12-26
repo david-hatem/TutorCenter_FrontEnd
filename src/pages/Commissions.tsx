@@ -159,8 +159,8 @@ function Filters({ groups, teachers, filters, onFilterChange }: FiltersProps) {
 
 const columns: ColumnDef<Commission>[] = [
   {
-    header: "Teacher",
-    accessorFn: (row) => `${row.professeur.prenom} ${row.professeur.nom}`,
+    header: "Professeur",
+    id: "teacher",
     cell: ({ row }) => (
       <div>
         <div className="font-medium">
@@ -173,8 +173,8 @@ const columns: ColumnDef<Commission>[] = [
     ),
   },
   {
-    header: "Student",
-    accessorFn: (row) => `${row.etudiant.prenom} ${row.etudiant.nom}`,
+    header: "Étudiant",
+    id: "student",
     cell: ({ row }) => (
       <div>
         <div className="font-medium">
@@ -187,10 +187,24 @@ const columns: ColumnDef<Commission>[] = [
     ),
   },
   {
-    header: "Amount",
+    header: "Niveau & Filière",
+    id: "niveau_filiere",
+    cell: ({ row }) => (
+      <div className="space-y-1">
+        <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs block w-fit">
+          {row.original.groupe.niveau_info?.nom_niveau || 'N/A'}
+        </span>
+        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs block w-fit">
+          {row.original.groupe.filiere_info?.nom_filiere || 'N/A'}
+        </span>
+      </div>
+    ),
+  },
+  {
+    header: "Montant",
     accessorKey: "montant",
     cell: ({ row }) => (
-      <span className="font-medium">
+      <span className="font-medium text-green-600">
         {row.original.montant.toLocaleString()} MAD
       </span>
     ),
@@ -198,11 +212,14 @@ const columns: ColumnDef<Commission>[] = [
   {
     header: "Date",
     accessorKey: "date_comission",
-    cell: ({ row }) =>
-      new Date(row.original.date_comission).toLocaleDateString(),
+    cell: ({ row }) => (
+      <span>
+        {new Date(row.original.date_comission).toLocaleDateString('fr-FR')}
+      </span>
+    ),
   },
   {
-    header: "Status",
+    header: "Statut",
     accessorKey: "statut_comission",
     cell: ({ row }) => (
       <span
@@ -214,6 +231,21 @@ const columns: ColumnDef<Commission>[] = [
       >
         {row.original.statut_comission.toLowerCase()}
       </span>
+    ),
+  },
+  {
+    header: "Actions",
+    id: "actions",
+    cell: ({ row }) => (
+      <div className="flex space-x-2">
+        <button
+          onClick={() => console.log(row.original)}
+          className="p-1 text-gray-600 hover:text-gray-800"
+          title="Imprimer"
+        >
+          <Printer className="w-4 h-4" />
+        </button>
+      </div>
     ),
   },
 ];
@@ -412,11 +444,12 @@ function PrintableCommissions({
       <table className="min-w-full border border-gray-200">
         <thead>
           <tr className="bg-gray-50">
-            <th className="px-4 py-2 text-left border-b">Teacher</th>
-            <th className="px-4 py-2 text-left border-b">Student</th>
-            <th className="px-4 py-2 text-left border-b">Amount</th>
+            <th className="px-4 py-2 text-left border-b">Professeur</th>
+            <th className="px-4 py-2 text-left border-b">Étudiant</th>
+            <th className="px-4 py-2 text-left border-b">Niveau & Filière</th>
+            <th className="px-4 py-2 text-left border-b">Montant</th>
             <th className="px-4 py-2 text-left border-b">Date</th>
-            <th className="px-4 py-2 text-left border-b">Status</th>
+            <th className="px-4 py-2 text-left border-b">Statut</th>
           </tr>
         </thead>
         <tbody>
@@ -443,10 +476,20 @@ function PrintableCommissions({
                 </div>
               </td>
               <td className="px-4 py-2">
+                <div className="space-y-1">
+                  <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs block w-fit">
+                    {commission.groupe.niveau_info?.nom_niveau || 'N/A'}
+                  </span>
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs block w-fit">
+                    {commission.groupe.filiere_info?.nom_filiere || 'N/A'}
+                  </span>
+                </div>
+              </td>
+              <td className="px-4 py-2">
                 {commission.montant.toLocaleString()} MAD
               </td>
               <td className="px-4 py-2">
-                {new Date(commission.date_comission).toLocaleDateString()}
+                {new Date(commission.date_comission).toLocaleDateString('fr-FR')}
               </td>
               <td className="px-4 py-2">{commission.statut_comission.toLowerCase()}</td>
             </tr>
@@ -457,7 +500,7 @@ function PrintableCommissions({
             <td colSpan={2} className="px-4 py-2 font-medium">
               Total
             </td>
-            <td colSpan={3} className="px-4 py-2 font-medium">
+            <td colSpan={4} className="px-4 py-2 font-medium">
               {totalAmount.toLocaleString()} MAD
             </td>
           </tr>
@@ -532,13 +575,13 @@ function Commissions() {
 
     if (newFilters.filiereId) {
       filtered = filtered.filter(
-        (commission) => commission.groupe.filiere === newFilters.filiereId
+        (commission) => commission.groupe.filiere_info?.id === newFilters.filiereId
       );
     }
 
     if (newFilters.niveauId) {
       filtered = filtered.filter(
-        (commission) => commission.groupe.niveau === newFilters.niveauId
+        (commission) => commission.groupe.niveau_info?.id === newFilters.niveauId
       );
     }
 

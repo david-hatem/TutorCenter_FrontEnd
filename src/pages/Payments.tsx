@@ -154,8 +154,8 @@ function Filters({ groups, students, filters, onFilterChange }: FiltersProps) {
 
 const columns: ColumnDef<Payment>[] = [
   {
-    header: "Student",
-    accessorFn: (row) => `${row.etudiant.prenom} ${row.etudiant.nom}`,
+    header: "Étudiant",
+    id: "student",
     cell: ({ row }) => (
       <div>
         <div className="font-medium">
@@ -168,36 +168,25 @@ const columns: ColumnDef<Payment>[] = [
     ),
   },
   {
-    header: "Amount",
+    header: "Montant",
     accessorKey: "montant",
     cell: ({ row }) => (
-      <div>
-        <span className="font-medium">
-          {row.original.montant.toLocaleString()} MAD
-        </span>
-        {row.original.montant_total &&
-          row.original.statut_paiement === "Partial" && (
-            <div className="text-sm text-gray-500">
-              of {row.original.montant_total.toLocaleString()} MAD
-            </div>
-          )}
-      </div>
+      <span className="font-medium text-green-600">
+        {row.original.montant.toLocaleString()} MAD
+      </span>
     ),
   },
   {
     header: "Date",
     accessorKey: "date_paiement",
-    cell: ({ row }) =>
-      new Date(row.original.date_paiement).toLocaleString('fr-FR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      }),
+    cell: ({ row }) => (
+      <span>
+        {new Date(row.original.date_paiement).toLocaleDateString('fr-FR')}
+      </span>
+    ),
   },
   {
-    header: "Status",
+    header: "Statut",
     accessorKey: "statut_paiement",
     cell: ({ row }) => (
       <span
@@ -212,12 +201,26 @@ const columns: ColumnDef<Payment>[] = [
     ),
   },
   {
-    header: "Remaining",
+    header: "Restant",
     accessorKey: "remaining",
     cell: ({ row }) => (
       <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
         {row.original.remaining ? `${row.original.remaining.toLocaleString()} MAD` : '-'}
       </span>
+    ),
+  },
+  {
+    header: "Niveau & Filière",
+    id: "niveau_filiere",
+    cell: ({ row }) => (
+      <div className="space-y-1">
+        <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs block w-fit">
+          {row.original.groupe.niveau_info?.nom_niveau || 'N/A'}
+        </span>
+        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs block w-fit">
+          {row.original.groupe.filiere_info?.nom_filiere || 'N/A'}
+        </span>
+      </div>
     ),
   },
   {
@@ -228,7 +231,7 @@ const columns: ColumnDef<Payment>[] = [
         <button
           onClick={() => row.original.onPrint?.(row.original)}
           className="p-1 text-gray-600 hover:text-gray-800"
-          title="Print payment"
+          title="Imprimer"
         >
           <Printer className="w-4 h-4" />
         </button>
@@ -236,7 +239,7 @@ const columns: ColumnDef<Payment>[] = [
           <button
             onClick={() => row.original.onCompletePayment?.(row.original)}
             className="p-1 text-blue-600 hover:text-blue-800"
-            title="Complete payment"
+            title="Compléter le paiement"
           >
             <PlusCircle className="w-4 h-4" />
           </button>
@@ -245,63 +248,6 @@ const columns: ColumnDef<Payment>[] = [
     ),
   },
 ];
-
-function PrintablePayment({ payment }: { payment: Payment }) {
-  return (
-    <div className="p-8 bg-white" id="printable-payment">
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold">Reçu de Paiement</h1>
-        <p className="text-gray-500">#{payment.id}</p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 mb-8">
-        <div>
-          <h2 className="font-bold mb-2">Informations de l'Étudiant</h2>
-          <p>
-            {payment.etudiant.prenom} {payment.etudiant.nom}
-          </p>
-          <p>{payment.etudiant.telephone}</p>
-          <p>{payment.etudiant.adresse}</p>
-        </div>
-        <div className="text-right">
-          <h2 className="font-bold mb-2">Détails du Paiement</h2>
-          <p>Date : {new Date(payment.date_paiement).toLocaleString('fr-FR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      })}</p>
-          <p>Statut : {payment.statut_paiement}</p>
-          <p>Groupe : {payment.groupe.nom_groupe}</p>
-          <p>Montant Restant : {payment.remaining} MAD</p>
-        </div>
-      </div>
-
-      <div className="border-t border-b border-gray-200 py-4 mb-8">
-        <div className="flex justify-between mb-2">
-          <span className="font-bold">Montant Payé :</span>
-          <span>{payment.montant.toLocaleString()} MAD</span>
-        </div>
-        {payment.montant_total && payment.statut_paiement === "Partiel" && (
-          <div className="flex justify-between mb-2">
-            <span className="font-bold">Montant Total :</span>
-            <span>{payment.montant_total.toLocaleString()} MAD</span>
-          </div>
-        )}
-        {/* <div className="flex justify-between">
-          <span className="font-bold">Taux de Commission :</span>
-          <span>{payment.commission_percentage}%</span>
-        </div> */}
-      </div>
-
-      <div className="text-center text-sm text-gray-500">
-        <p>Merci pour votre paiement !</p>
-        <p>Ceci est un document généré par ordinateur.</p>
-      </div>
-    </div>
-  );
-}
 
 const initialData: Payment[] = [
   {
@@ -389,6 +335,63 @@ const initialData: Payment[] = [
   },
 ];
 
+function PrintablePayment({ payment }: { payment: Payment }) {
+  return (
+    <div className="p-8 bg-white" id="printable-payment">
+      <div className="text-center mb-8">
+        <h1 className="text-2xl font-bold">Reçu de Paiement</h1>
+        <p className="text-gray-500">#{payment.id}</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 mb-8">
+        <div>
+          <h2 className="font-bold mb-2">Informations de l'Étudiant</h2>
+          <p>
+            {payment.etudiant.prenom} {payment.etudiant.nom}
+          </p>
+          <p>{payment.etudiant.telephone}</p>
+          <p>{payment.etudiant.adresse}</p>
+        </div>
+        <div className="text-right">
+          <h2 className="font-bold mb-2">Détails du Paiement</h2>
+          <p>Date : {new Date(payment.date_paiement).toLocaleString('fr-FR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      })}</p>
+          <p>Statut : {payment.statut_paiement}</p>
+          <p>Groupe : {payment.groupe.nom_groupe}</p>
+          <p>Montant Restant : {payment.remaining} MAD</p>
+        </div>
+      </div>
+
+      <div className="border-t border-b border-gray-200 py-4 mb-8">
+        <div className="flex justify-between mb-2">
+          <span className="font-bold">Montant Payé :</span>
+          <span>{payment.montant.toLocaleString()} MAD</span>
+        </div>
+        {payment.montant_total && payment.statut_paiement === "Partiel" && (
+          <div className="flex justify-between mb-2">
+            <span className="font-bold">Montant Total :</span>
+            <span>{payment.montant_total.toLocaleString()} MAD</span>
+          </div>
+        )}
+        {/* <div className="flex justify-between">
+          <span className="font-bold">Taux de Commission :</span>
+          <span>{payment.commission_percentage}%</span>
+        </div> */}
+      </div>
+
+      <div className="text-center text-sm text-gray-500">
+        <p>Merci pour votre paiement !</p>
+        <p>Ceci est un document généré par ordinateur.</p>
+      </div>
+    </div>
+  );
+}
+
 function Payments() {
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -465,13 +468,13 @@ function Payments() {
 
     if (newFilters.filiereId) {
       filtered = filtered.filter(
-        (payment) => payment.groupe.filiere?.id === newFilters.filiereId
+        (payment) => payment.groupe.filiere_info?.id === newFilters.filiereId
       );
     }
 
     if (newFilters.niveauId) {
       filtered = filtered.filter(
-        (payment) => payment.groupe.niveau?.id === newFilters.niveauId
+        (payment) => payment.groupe.niveau_info?.id === newFilters.niveauId
       );
     }
 
