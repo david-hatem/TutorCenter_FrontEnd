@@ -106,3 +106,12 @@ export interface Etudiant {
   nom: string;
   prenom: string;
 }
+
+export interface PaymentFormData {
+  montant: number;
+  frais_inscription: number;
+  etudiant_id: number;
+  groupe_id: number;
+  commission_percentage: number | null;
+  professeurs: number[];
+}

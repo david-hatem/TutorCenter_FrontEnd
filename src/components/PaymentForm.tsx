@@ -36,7 +36,7 @@ function PaymentForm({
       frais_inscription: 0,
       etudiant_id: initialStudentId || 0,
       groupe_id: groups[0]?.id || 0,
-      commission_percentage: 100,
+      commission_percentage: null,
       professeurs: groups[0]?.professeurs?.map(p => p.id) || [],
     },
   ]);
@@ -96,7 +96,7 @@ function PaymentForm({
     if (data.frais_inscription < 0) {
       newErrors.frais_inscription = "Les frais d'inscription ne peuvent pas être négatifs";
     }
-    if (data.commission_percentage < 0 || data.commission_percentage > 100) {
+    if (data.commission_percentage !== null && (data.commission_percentage < 0 || data.commission_percentage > 100)) {
       newErrors.commission_percentage = "La commission doit être comprise entre 0 et 100";
     }
     if (!isCompletion) {
@@ -334,6 +334,76 @@ function PaymentForm({
             />
             {errors.montant && (
               <p className="mt-1 text-sm text-red-600">{errors.montant}</p>
+            )}
+          </div>
+
+          {/* Financial Details Grid */}
+          <div className="grid grid-cols-3 gap-4">
+            {/* Prix Subscription Display */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Prix Souscription
+              </label>
+              <input
+                type="number"
+                readOnly
+                className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm"
+                value={groups[0]?.prix_subscription || 0}
+              />
+            </div>
+
+            {/* Commission Percentage Input */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Commission (%)
+              </label>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                step="1"
+                placeholder="Entrez le % de commission"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                value={formData[0].commission_percentage || ''}
+                onChange={(e) => {
+                  const newCommissionPercentage = e.target.value === '' 
+                    ? null 
+                    : parseInt(e.target.value, 10);
+                  
+                  setFormData((prev) => {
+                    const newData = [...prev];
+                    newData[0] = {
+                      ...newData[0],
+                      commission_percentage: newCommissionPercentage
+                    };
+                    return newData;
+                  });
+                }}
+              />
+              {errors.commission_percentage && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.commission_percentage}
+                </p>
+              )}
+            </div>
+
+            {/* Commission Calculation Display */}
+            {formData[0].commission_percentage !== null && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Montant Commission
+                </label>
+                <input
+                  type="number"
+                  readOnly
+                  className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm"
+                  value={
+                    groups[0]?.prix_subscription 
+                    ? Math.round((groups[0].prix_subscription * formData[0].commission_percentage) / 100)
+                    : 0
+                  }
+                />
+              </div>
             )}
           </div>
 

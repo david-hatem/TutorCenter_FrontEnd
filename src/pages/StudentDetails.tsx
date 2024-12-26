@@ -44,6 +44,7 @@ interface StudentDetails {
       prenom: string;
       commission_fixe: number;
     }[];
+    prix_subscription: number;
   }[];
   paiements: {
     id: number;
@@ -591,6 +592,12 @@ function StudentDetails() {
                         </div>
                       ))}
                     </div>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500">Prix Abonnement:</span>
+                    <span className="text-sm font-medium">
+                      {group.prix_subscription.toLocaleString()} MAD
+                    </span>
                   </div>
                 </div>
               </div>
