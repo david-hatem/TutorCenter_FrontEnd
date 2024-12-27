@@ -73,27 +73,17 @@ export const exportNestedDataToExcel = (
   data: any[],
   fileName: string = "nested_data.xlsx"
 ): void => {
-  // Flatten the nested data
+  // Flatten the nested data with only essential columns
   const flattenedData = data.map((item) => ({
-    id: item.id,
-    montant: item.montant,
-    date_comission: item.date_comission,
-    statut_comission: item.statut_comission,
-    professeur_id: item.professeur?.id,
-    professeur_nom: item.professeur?.nom,
-    professeur_prenom: item.professeur?.prenom,
-    professeur_telephone: item.professeur?.telephone,
-    professeur_adresse: item.professeur?.adresse,
-    professeur_specialite: item.professeur?.specialite,
-    etudiant_id: item.etudiant?.id,
-    etudiant_nom: item.etudiant?.nom,
-    etudiant_prenom: item.etudiant?.prenom,
-    etudiant_telephone: item.etudiant?.telephone,
-    etudiant_adresse: item.etudiant?.adresse,
-    groupe_id: item.groupe?.id,
-    groupe_nom_groupe: item.groupe?.nom_groupe,
-    groupe_niveau: item.groupe?.niveau,
-    groupe_filiere: item.groupe?.filiere,
+    "Professeur": `${item.professeur?.prenom} ${item.professeur?.nom}`,
+    "Étudiant": `${item.etudiant?.prenom} ${item.etudiant?.nom}`,
+    "Groupe": item.groupe?.nom_groupe,
+    "Niveau": item.groupe?.niveau_info?.nom_niveau || '',
+    "Filière": item.groupe?.filiere_info?.nom_filiere || '',
+    "Montant": item.montant,
+    "Date": new Date(item.date_comission).toLocaleDateString('fr-FR'),
+    "Mois": item.month_name,
+    "Statut": item.statut_comission.toLowerCase()
   }));
 
   // Create worksheet from flattened data
@@ -101,7 +91,7 @@ export const exportNestedDataToExcel = (
 
   // Create a new workbook and append the worksheet
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Commissions");
 
   // Save the Excel file
   XLSX.writeFile(workbook, fileName);

@@ -20,6 +20,7 @@ interface FiltersProps {
     niveauId: number;
     startDate: string;
     endDate: string;
+    month: string;
   };
   onFilterChange: (filters: any) => void;
 }
@@ -36,8 +37,14 @@ function Filters({ groups, teachers, filters, onFilterChange }: FiltersProps) {
     nom_niveau: groups.find(g => g.niveau?.id === id)?.niveau?.nom_niveau
   })).filter(n => n.id && n.nom_niveau);
 
+  // List of months in French
+  const months = [
+    "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+    "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+  ];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4 mb-6">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Filière
@@ -121,6 +128,26 @@ function Filters({ groups, teachers, filters, onFilterChange }: FiltersProps) {
           {teachers.map((teacher) => (
             <option key={teacher.id} value={teacher.id}>
               {teacher.prenom} {teacher.nom}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Mois
+        </label>
+        <select
+          className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          value={filters.month || ""}
+          onChange={(e) =>
+            onFilterChange({ ...filters, month: e.target.value })
+          }
+        >
+          <option value="">Tous les mois</option>
+          {months.map((month) => (
+            <option key={month} value={month}>
+              {month}
             </option>
           ))}
         </select>
@@ -219,6 +246,15 @@ const columns: ColumnDef<Commission>[] = [
     ),
   },
   {
+    header: "Mois",
+    accessorKey: "month_name",
+    cell: ({ row }) => (
+      <span>
+        {new Date(row.original.date_comission).toLocaleString('default', { month: 'long' })}
+      </span>
+    ),
+  },
+  {
     header: "Statut",
     accessorKey: "statut_comission",
     cell: ({ row }) => (
@@ -231,21 +267,6 @@ const columns: ColumnDef<Commission>[] = [
       >
         {row.original.statut_comission.toLowerCase()}
       </span>
-    ),
-  },
-  {
-    header: "Actions",
-    id: "actions",
-    cell: ({ row }) => (
-      <div className="flex space-x-2">
-        <button
-          onClick={() => console.log(row.original)}
-          className="p-1 text-gray-600 hover:text-gray-800"
-          title="Imprimer"
-        >
-          <Printer className="w-4 h-4" />
-        </button>
-      </div>
     ),
   },
 ];
@@ -432,6 +453,9 @@ function PrintableCommissions({
           {filters.endDate && (
             <p>To: {new Date(filters.endDate).toLocaleDateString()}</p>
           )}
+          {filters.month && (
+            <p>Month: {filters.month}</p>
+          )}
         </div>
       </div>
 
@@ -449,6 +473,7 @@ function PrintableCommissions({
             <th className="px-4 py-2 text-left border-b">Niveau & Filière</th>
             <th className="px-4 py-2 text-left border-b">Montant</th>
             <th className="px-4 py-2 text-left border-b">Date</th>
+            <th className="px-4 py-2 text-left border-b">Mois</th>
             <th className="px-4 py-2 text-left border-b">Statut</th>
           </tr>
         </thead>
@@ -491,6 +516,9 @@ function PrintableCommissions({
               <td className="px-4 py-2">
                 {new Date(commission.date_comission).toLocaleDateString('fr-FR')}
               </td>
+              <td className="px-4 py-2">
+                {new Date(commission.date_comission).toLocaleString('default', { month: 'long' })}
+              </td>
               <td className="px-4 py-2">{commission.statut_comission.toLowerCase()}</td>
             </tr>
           ))}
@@ -500,7 +528,7 @@ function PrintableCommissions({
             <td colSpan={2} className="px-4 py-2 font-medium">
               Total
             </td>
-            <td colSpan={4} className="px-4 py-2 font-medium">
+            <td colSpan={5} className="px-4 py-2 font-medium">
               {totalAmount.toLocaleString()} MAD
             </td>
           </tr>
@@ -525,6 +553,7 @@ function Commissions() {
     niveauId: 0,
     startDate: "",
     endDate: "",
+    month: "",
   });
   const printRef = useRef<HTMLDivElement>(null);
 
@@ -608,6 +637,12 @@ function Commissions() {
       filtered = filtered.filter(
         (commission) =>
           new Date(commission.date_comission) <= new Date(newFilters.endDate)
+      );
+    }
+
+    if (newFilters.month) {
+      filtered = filtered.filter(
+        (commission) => commission.month_name === newFilters.month
       );
     }
 

@@ -50,6 +50,7 @@ interface StudentDetails {
     id: number;
     montant: number;
     date_paiement: string;
+    month_name: string;
     statut_paiement: string;
     groupe: string;
   }[];
@@ -629,6 +630,7 @@ function StudentDetails() {
                     {payment.montant.toLocaleString()} MAD
                   </p>
                   <p className="text-sm text-gray-500">{payment.groupe}</p>
+                  <p className="text-sm text-gray-500">{payment.month_name}</p>
                 </div>
                 <div className="text-right">
                   <span

@@ -40,6 +40,7 @@ interface TeacherDetails {
     id: number;
     montant: number;
     date_comission: string;
+    month_name: string;
     statut_comission: string;
     etudiant: {
       id: number;
@@ -409,6 +410,9 @@ function TeacherDetails() {
                   </p>
                   <p className="text-xs text-gray-400">
                     {commission.groupe.nom_groupe}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {commission.month_name}
                   </p>
                 </div>
                 <div className="text-right">

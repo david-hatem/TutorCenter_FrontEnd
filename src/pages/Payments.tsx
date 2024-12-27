@@ -18,6 +18,7 @@ interface FiltersProps {
     niveauId: number;
     startDate: string;
     endDate: string;
+    month: string;
   };
   onFilterChange: (filters: any) => void;
 }
@@ -34,8 +35,14 @@ function Filters({ groups, students, filters, onFilterChange }: FiltersProps) {
     nom_niveau: groups.find(g => g.niveau?.id === id)?.niveau?.nom_niveau
   })).filter(n => n.id && n.nom_niveau);
 
+  // List of months in French
+  const months = [
+    "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+    "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+  ];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4 mb-6">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Filière
@@ -123,6 +130,26 @@ function Filters({ groups, students, filters, onFilterChange }: FiltersProps) {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
+          Mois
+        </label>
+        <select
+          className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          value={filters.month || ""}
+          onChange={(e) =>
+            onFilterChange({ ...filters, month: e.target.value })
+          }
+        >
+          <option value="">Tous les mois</option>
+          {months.map((month) => (
+            <option key={month} value={month}>
+              {month}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
           Date début
         </label>
         <input
@@ -177,6 +204,15 @@ const columns: ColumnDef<Payment>[] = [
     ),
   },
   {
+    header: "Frais d'inscription",
+    accessorKey: "frais_inscription",
+    cell: ({ row }) => (
+      <span className="font-medium text-blue-600">
+        {row.original.frais_inscription ? `${row.original.frais_inscription.toLocaleString()} MAD` : '-'}
+      </span>
+    ),
+  },
+  {
     header: "Date",
     accessorKey: "date_paiement",
     cell: ({ row }) => (
@@ -184,6 +220,10 @@ const columns: ColumnDef<Payment>[] = [
         {new Date(row.original.date_paiement).toLocaleDateString('fr-FR')}
       </span>
     ),
+  },
+  {
+    header: "Mois",
+    accessorKey: "month_name",
   },
   {
     header: "Statut",
@@ -291,6 +331,7 @@ const initialData: Payment[] = [
       created_at: "2024-10-25T19:14:26.780492Z",
     },
     commission_percentage: 50.0,
+    month_name: "Juin"
   },
   {
     id: 2,
@@ -332,6 +373,7 @@ const initialData: Payment[] = [
       created_at: "2024-10-26T10:20:15.123456Z",
     },
     commission_percentage: 60.0,
+    month_name: "Juin"
   },
 ];
 
@@ -361,6 +403,7 @@ function PrintablePayment({ payment }: { payment: Payment }) {
         hour: '2-digit',
         minute: '2-digit'
       })}</p>
+          <p>Mois : {payment.month_name}</p>
           <p>Statut : {payment.statut_paiement}</p>
           <p>Groupe : {payment.groupe.nom_groupe}</p>
           <p>Montant Restant : {payment.remaining} MAD</p>
@@ -408,6 +451,7 @@ function Payments() {
     niveauId: 0,
     startDate: "",
     endDate: "",
+    month: "",
   });
   const [totalAmount, setTotalAmount] = useState(
     initialData.reduce((sum, payment) => sum + payment.montant, 0)
@@ -501,6 +545,12 @@ function Payments() {
       filtered = filtered.filter(
         (payment) =>
           new Date(payment.date_paiement) <= new Date(newFilters.endDate)
+      );
+    }
+
+    if (newFilters.month) {
+      filtered = filtered.filter(
+        (payment) => payment.month_name === newFilters.month
       );
     }
 
