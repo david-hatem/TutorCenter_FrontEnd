@@ -307,20 +307,6 @@ function Students() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Prénom
-            </label>
-            <input
-              type="text"
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              value={formData.prenom}
-              onChange={(e) =>
-                setFormData({ ...formData, prenom: e.target.value })
-              }
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
               Nom
             </label>
             <input
@@ -330,6 +316,20 @@ function Students() {
               value={formData.nom}
               onChange={(e) =>
                 setFormData({ ...formData, nom: e.target.value })
+              }
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Prénom
+            </label>
+            <input
+              type="text"
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              value={formData.prenom}
+              onChange={(e) =>
+                setFormData({ ...formData, prenom: e.target.value })
               }
             />
           </div>

@@ -134,103 +134,100 @@ function PaymentForm({
         fetch();
         fetch2();
 
-        // Process each payment in the response
-        createdPay.forEach((paymentResponse) => {
+        // Open a single print window for all payments
+        const printWindow = window.open("", "_blank");
+        if (!printWindow) return;
+
+        // Start the HTML document
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Reçus de Paiement</title>
+              <style>
+                body {
+                  font-family: system-ui, -apple-system, sans-serif;
+                  line-height: 1.5;
+                  margin: 0;
+                  padding: 20px;
+                }
+                .print-content {
+                  max-width: 800px;
+                  margin: 0 auto;
+                }
+                .text-center { text-align: center; }
+                .mb-8 { margin-bottom: 2rem; }
+                .mb-2 { margin-bottom: 0.5rem; }
+                .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+                .font-bold { font-weight: bold; }
+                .text-2xl { font-size: 1.5rem; }
+                .text-sm { font-size: 0.875rem; }
+                .text-gray-500 { color: #6b7280; }
+                .border-t { border-top: 1px solid #e5e7eb; }
+                .pt-4 { padding-top: 1rem; }
+                .payment-receipt {
+                  border-bottom: 2px dashed #e5e7eb;
+                  margin-bottom: 2rem;
+                  padding-bottom: 2rem;
+                }
+                .payment-receipt:last-child {
+                  border-bottom: none;
+                  margin-bottom: 0;
+                }
+                @media print {
+                  body { print-color-adjust: exact; }
+                  .payment-receipt { page-break-inside: avoid; }
+                }
+              </style>
+            </head>
+            <body>
+              <div class="print-content">
+        `);
+
+        // Add each payment receipt
+        createdPay.forEach((paymentResponse, index) => {
           const payment = paymentResponse.payment;
-          const printWindow = window.open("", "_blank");
-          if (!printWindow) return;
-
           printWindow.document.write(`
-            <html>
-              <head>
-                <title>Reçu de Paiement</title>
-                <style>
-                  body {
-                    font-family: system-ui, -apple-system, sans-serif;
-                    line-height: 1.5;
-                    margin: 0;
-                    padding: 20px;
-                  }
-                  .print-content {
-                    max-width: 800px;
-                    margin: 0 auto;
-                  }
-                  .text-center { text-align: center; }
-                  .mb-8 { margin-bottom: 2rem; }
-                  .mb-2 { margin-bottom: 0.5rem; }
-                  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-                  .font-bold { font-weight: bold; }
-                  .text-2xl { font-size: 1.5rem; }
-                  .text-sm { font-size: 0.875rem; }
-                  .text-gray-500 { color: #6b7280; }
-                  .border-t { border-top: 1px solid #e5e7eb; }
-                  .pt-4 { padding-top: 1rem; }
-                  @media print {
-                    body { print-color-adjust: exact; }
-                  }
-                </style>
-              </head>
-              <body>
-                <div class="print-content">
-                  <div class="text-center mb-8">
-                    <h1 class="text-2xl font-bold">Reçu de Paiement</h1>
-                    <p class="text-sm text-gray-500">
-                      Date: ${new Date(payment.date_paiement).toLocaleString('fr-FR')}
-                    </p>
-                  </div>
+            <div class="payment-receipt">
+              <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold">Reçu de Paiement ${createdPay.length > 1 ? `#${index + 1}` : ''}</h1>
+                <p class="text-sm text-gray-500">
+                  Date: ${new Date(payment.date_paiement).toLocaleString('fr-FR')}
+                </p>
+              </div>
 
-                  <div class="grid mb-8">
-                    <div>
-                      <h2 class="font-bold mb-2">Informations de l'étudiant</h2>
-                      <p>Nom: ${payment.etudiant.prenom} ${payment.etudiant.nom}</p>
-                      <p>Téléphone: ${payment.etudiant.telephone || 'Non spécifié'}</p>
-                      <p>Adresse: ${payment.etudiant.adresse || 'Non spécifiée'}</p>
-                    </div>
-                    <div>
-                      <h2 class="font-bold mb-2">Détails du paiement</h2>
-                      <p>Groupe: ${payment.groupe.nom_groupe}</p>
-                      <p>Montant: ${payment.montant.toLocaleString()} MAD</p>
-                      <p>Montant total: ${payment.montant_total.toLocaleString()} MAD</p>
-                      <p>Statut: ${payment.statut_paiement}</p>
-                      ${payment.remaining ? 
-                        `<p>Montant restant: ${payment.remaining.toLocaleString()} MAD</p>` 
-                        : ''}
-                      ${payment.frais_inscription > 0 ? 
-                        `<p>Frais d'inscription: ${payment.frais_inscription.toLocaleString()} MAD</p>` 
-                        : ''}
-                    </div>
-                  </div>
-
-                  ${payment.groupe.professeurs && payment.groupe.professeurs.length > 0 ? `
-                    <div class="mb-8">
-                      <h2 class="font-bold mb-2">Professeurs</h2>
-                      <ul>
-                        ${payment.groupe.professeurs.map(prof => 
-                          `<li>${prof.prenom} ${prof.nom}</li>`
-                        ).join('')}
-                      </ul>
-                    </div>
-                  ` : ''}
-
-                  <div class="border-t pt-4 text-center text-sm text-gray-500">
-                    <p>${paymentResponse.message}</p>
-                    <p>Merci de votre confiance!</p>
-                  </div>
+              <div class="grid mb-8">
+                <div>
+                  <h2 class="font-bold mb-2">Informations de l'étudiant</h2>
+                  <p>Nom: ${payment.etudiant.prenom} ${payment.etudiant.nom}</p>
+                  <p>Téléphone: ${payment.etudiant.telephone || 'Non spécifié'}</p>
+                  <p>Adresse: ${payment.etudiant.adresse || 'Non spécifiée'}</p>
                 </div>
-              </body>
-            </html>
+                <div>
+                  <h2 class="font-bold mb-2">Détails du paiement</h2>
+                  <p>Groupe: ${payment.groupe.nom_groupe}</p>
+                  <p>Montant payé: ${payment.montant.toLocaleString()} MAD</p>
+                  <p>Reste à payer: ${(payment.groupe.prix_subscription - payment.montant_total).toLocaleString()} MAD</p>
+                  ${payment.frais_inscription > 0 ? 
+                    `<p>Frais d'inscription: ${payment.frais_inscription.toLocaleString()} MAD</p>` 
+                    : ''}
+                </div>
+              </div>
+            </div>
           `);
-
-          printWindow.document.close();
-          printWindow.focus();
-
-          // Print after a short delay to ensure content is loaded
-          setTimeout(() => {
-            printWindow.print();
-          }, 500);
         });
 
-        onClose();
+        // Close the HTML document
+        printWindow.document.write(`
+              </div>
+              <script>
+                window.onload = function() {
+                  window.print();
+                }
+              </script>
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
       } else {
         setErrors({ submit: "Failed to create payment. Please try again." });
       }
@@ -348,7 +345,7 @@ function PaymentForm({
                 type="number"
                 readOnly
                 className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm"
-                value={groups[0]?.prix_subscription || 0}
+                value={groups.find(g => g.id === payment.groupe_id)?.prix_subscription || 0}
               />
             </div>
 
@@ -364,20 +361,13 @@ function PaymentForm({
                 step="1"
                 placeholder="Entrez le % de commission"
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                value={formData[0].commission_percentage || ''}
+                value={payment.commission_percentage || ''}
                 onChange={(e) => {
                   const newCommissionPercentage = e.target.value === '' 
                     ? null 
                     : parseInt(e.target.value, 10);
                   
-                  setFormData((prev) => {
-                    const newData = [...prev];
-                    newData[0] = {
-                      ...newData[0],
-                      commission_percentage: newCommissionPercentage
-                    };
-                    return newData;
-                  });
+                  handleFieldChange(index, "commission_percentage", newCommissionPercentage);
                 }}
               />
               {errors.commission_percentage && (
@@ -388,7 +378,7 @@ function PaymentForm({
             </div>
 
             {/* Commission Calculation Display */}
-            {formData[0].commission_percentage !== null && (
+            {payment.commission_percentage !== null && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Montant Commission
@@ -398,8 +388,8 @@ function PaymentForm({
                   readOnly
                   className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm"
                   value={
-                    groups[0]?.prix_subscription 
-                    ? Math.round((groups[0].prix_subscription * formData[0].commission_percentage) / 100)
+                    groups.find(g => g.id === payment.groupe_id)?.prix_subscription 
+                    ? Math.round((groups.find(g => g.id === payment.groupe_id)?.prix_subscription * payment.commission_percentage) / 100)
                     : 0
                   }
                 />
