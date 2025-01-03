@@ -50,9 +50,10 @@ interface StudentDetails {
     id: number;
     montant: number;
     date_paiement: string;
-    month_name: string;
+    mois_paiement: string;
     statut_paiement: string;
     groupe: string;
+    month_name: string;
   }[];
   total_paiements: number;
   total_groupes: number;

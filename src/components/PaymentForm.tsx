@@ -38,6 +38,7 @@ function PaymentForm({
       groupe_id: groups[0]?.id || 0,
       commission_percentage: null,
       professeurs: groups[0]?.professeurs?.map(p => p.id) || [],
+      mois_paiement: new Date().toISOString().slice(0, 7), // Format: YYYY-MM
     },
   ]);
 
@@ -258,6 +259,7 @@ function PaymentForm({
             groupe_id: groups[0]?.id || 0,
             commission_percentage: 100,
             professeurs: groups[0]?.professeurs?.map(p => p.id) || [],
+            mois_paiement: new Date().toISOString().slice(0, 7), // Format: YYYY-MM
           },
         ];
       }
@@ -270,6 +272,7 @@ function PaymentForm({
           groupe_id: groups[0]?.id || 0,
           commission_percentage: 100,
           professeurs: groups[0]?.professeurs?.map(p => p.id) || [],
+          mois_paiement: new Date().toISOString().slice(0, 7), // Format: YYYY-MM
         },
       ];
     });
@@ -312,26 +315,47 @@ function PaymentForm({
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Montant {isCompletion ? "restant" : ""} (MAD)
-            </label>
-            <input
-              type="number"
-              value={payment.montant}
-              onChange={(e) =>
-                handleFieldChange(index, "montant", parseFloat(e.target.value))
-              }
-              className={`mt-1 block w-full rounded-md shadow-sm ${
-                errors.montant
-                  ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                  : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-              }`}
-              required
-            />
-            {errors.montant && (
-              <p className="mt-1 text-sm text-red-600">{errors.montant}</p>
-            )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Montant {isCompletion ? "restant" : ""} (MAD)
+              </label>
+              <input
+                type="number"
+                value={payment.montant}
+                onChange={(e) =>
+                  handleFieldChange(index, "montant", parseFloat(e.target.value))
+                }
+                className={`mt-1 block w-full rounded-md shadow-sm ${
+                  errors.montant
+                    ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                    : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                }`}
+                required
+              />
+              {errors.montant && (
+                <p className="mt-1 text-sm text-red-600">{errors.montant}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Mois de paiement
+              </label>
+              <input
+                type="month"
+                value={payment.mois_paiement}
+                onChange={(e) => {
+                  const newData = [...formData];
+                  newData[index] = {
+                    ...newData[index],
+                    mois_paiement: e.target.value,
+                  };
+                  setFormData(newData);
+                }}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              />
+            </div>
           </div>
 
           {/* Financial Details Grid */}

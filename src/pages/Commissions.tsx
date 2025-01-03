@@ -250,7 +250,7 @@ const columns: ColumnDef<Commission>[] = [
     accessorKey: "month_name",
     cell: ({ row }) => (
       <span>
-        {new Date(row.original.date_comission).toLocaleString('default', { month: 'long' })}
+        {row.original.month_name}
       </span>
     ),
   },
@@ -517,7 +517,7 @@ function PrintableCommissions({
                 {new Date(commission.date_comission).toLocaleDateString('fr-FR')}
               </td>
               <td className="px-4 py-2">
-                {new Date(commission.date_comission).toLocaleString('default', { month: 'long' })}
+                {commission.month_name}
               </td>
               <td className="px-4 py-2">{commission.statut_comission.toLowerCase()}</td>
             </tr>

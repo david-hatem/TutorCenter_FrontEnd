@@ -46,11 +46,42 @@ export interface Student {
 export interface Paiement {
   id: number;
   montant: number;
+  montant_total: number;
+  remaining: number;
+  frais_inscription: number;
   date_paiement: string; // ISO date string
+  mois_paiement: string;
+  month_name: string;
   statut_paiement: string;
   groupe: string;
   commission?: number;
   commission_percentage?: number;
+}
+
+export interface Payment {
+  id: number;
+  montant: number;
+  montant_total: number;
+  remaining: number;
+  frais_inscription: number;
+  date_paiement: string;
+  mois_paiement: string;
+  month_name: string;
+  statut_paiement: string;
+  groupe: string;
+  etudiant: {
+    id: number;
+    nom: string;
+    prenom: string;
+  };
+  niveau: {
+    id: number;
+    nom_niveau: string;
+  };
+  filiere: {
+    id: number;
+    nom_filiere: string;
+  };
 }
 
 export interface Groupe {
@@ -93,11 +124,26 @@ export interface Commission {
   id: number;
   montant: number;
   date_comission: string; // ISO date string
+  mois_paiement: string;
+  month_name: string;
   statut_comission: string;
   etudiant: Etudiant;
   groupe: {
     id: number;
     nom_groupe: string;
+  };
+  professeur: {
+    id: number;
+    nom: string;
+    prenom: string;
+  };
+  niveau: {
+    id: number;
+    nom_niveau: string;
+  };
+  filiere: {
+    id: number;
+    nom_filiere: string;
   };
 }
 
@@ -114,4 +160,5 @@ export interface PaymentFormData {
   groupe_id: number;
   commission_percentage: number | null;
   professeurs: number[];
+  mois_paiement: string;
 }
