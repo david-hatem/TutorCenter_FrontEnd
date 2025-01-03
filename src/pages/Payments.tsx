@@ -85,26 +85,6 @@ function Filters({ groups, students, filters, onFilterChange }: FiltersProps) {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Étudiant
-        </label>
-        <select
-          className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          value={filters.studentId || ""}
-          onChange={(e) =>
-            onFilterChange({ ...filters, studentId: Number(e.target.value) || 0 })
-          }
-        >
-          <option value="">Tous les étudiants</option>
-          {students.map((student) => (
-            <option key={student.id} value={student.id}>
-              {student.prenom} {student.nom}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
           Groupe
         </label>
         <select
@@ -444,6 +424,7 @@ function Payments() {
   const [filteredPayments, setFilteredPayments] = useState([]);
   const [groups, setGroups] = useState<Group[]>([]);
   const [students, setStudents] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
     groupId: 0,
     studentId: 0,
@@ -519,12 +500,6 @@ function Payments() {
     if (newFilters.niveauId) {
       filtered = filtered.filter(
         (payment) => payment.groupe.niveau_info?.id === newFilters.niveauId
-      );
-    }
-
-    if (newFilters.studentId) {
-      filtered = filtered.filter(
-        (payment) => payment.etudiant.id === newFilters.studentId
       );
     }
 
@@ -700,18 +675,86 @@ function Payments() {
     <>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Payments</h1>
-            <p className="text-sm text-gray-500">
-              Total amount: {totalAmount.toLocaleString()} MAD
-            </p>
+          <div className="flex-1 max-w-lg">
+            <input
+              type="text"
+              placeholder="Rechercher par nom d'étudiant..."
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                const query = e.target.value.toLowerCase();
+                let filtered = [...payments];
+                
+                // Filter by student name
+                if (query) {
+                  filtered = filtered.filter(
+                    (payment) =>
+                      `${payment.etudiant.prenom} ${payment.etudiant.nom}`
+                        .toLowerCase()
+                        .includes(query)
+                  );
+                }
+
+                // Apply other filters
+                if (filters.filiereId) {
+                  filtered = filtered.filter(
+                    (payment) => payment.groupe.filiere_info?.id === filters.filiereId
+                  );
+                }
+
+                if (filters.niveauId) {
+                  filtered = filtered.filter(
+                    (payment) => payment.groupe.niveau_info?.id === filters.niveauId
+                  );
+                }
+
+                if (filters.groupId) {
+                  filtered = filtered.filter(
+                    (payment) => payment.groupe.id === filters.groupId
+                  );
+                }
+
+                if (filters.startDate) {
+                  filtered = filtered.filter(
+                    (payment) =>
+                      new Date(payment.date_paiement) >= new Date(filters.startDate)
+                  );
+                }
+
+                if (filters.endDate) {
+                  filtered = filtered.filter(
+                    (payment) =>
+                      new Date(payment.date_paiement) <= new Date(filters.endDate)
+                  );
+                }
+
+                if (filters.month) {
+                  filtered = filtered.filter(
+                    (payment) => payment.month_name === filters.month
+                  );
+                }
+
+                // Add action handlers to each payment
+                const enhancedPayments = filtered.map(payment => ({
+                  ...payment,
+                  onPrint: () => handlePrint(payment),
+                  onCompletePayment: () => handleCompletePayment(payment)
+                }));
+
+                setFilteredPayments(enhancedPayments);
+                setTotalAmount(filtered.reduce((sum, p) => sum + p.montant, 0));
+              }}
+            />
           </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-          >
-            Add Payment
-          </button>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            >
+              Add Payment
+            </button>
+          </div>
         </div>
 
         <Filters
@@ -739,22 +782,19 @@ function Payments() {
         title={selectedPayment ? "Complete Payment" : "Add New Payment"}
       >
         <PaymentForm
-          fetch={fetchPayments}
-          id={selectedPayment?.id}
           onSubmit={handleCreatePayment}
           onClose={() => {
             setIsModalOpen(false);
             setSelectedPayment(null);
           }}
           initialStudentId={selectedPayment?.etudiant.id}
-          students={[]}
-          groups={[selectedPayment?.groupe].filter(Boolean)}
-          isCompletion={!!selectedPayment}
-          remainingAmount={
-            selectedPayment?.montant_total
-              ? selectedPayment.montant_total - selectedPayment.montant
-              : undefined
-          }
+          students={students}
+          groups={groups}
+          isCompletion={selectedPayment !== null}
+          remainingAmount={selectedPayment?.remaining}
+          id={selectedPayment?.id}
+          fetch={fetchPayments}
+          fetch2={fetchPayments}
         />
       </Modal>
 

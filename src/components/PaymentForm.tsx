@@ -32,7 +32,7 @@ function PaymentForm({
 }: PaymentFormProps) {
   const [formData, setFormData] = useState<PaymentFormData[]>([
     {
-      montant: remainingAmount || 0,
+      montant: 0,
       frais_inscription: 0,
       etudiant_id: initialStudentId || 0,
       groupe_id: groups[0]?.id || 0,
@@ -47,7 +47,7 @@ function PaymentForm({
       setFormData([
         {
           ...formData[0],
-          montant: remainingAmount,
+          montant: 0,
         },
       ]);
     }
@@ -318,14 +318,30 @@ function PaymentForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Montant {isCompletion ? "restant" : ""} (MAD)
+                Montant à payer (Restant: {remainingAmount?.toLocaleString()} MAD)
               </label>
               <input
                 type="number"
                 value={payment.montant}
-                onChange={(e) =>
-                  handleFieldChange(index, "montant", parseFloat(e.target.value))
-                }
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  if (isCompletion && remainingAmount && value > remainingAmount) {
+                    setErrors({
+                      ...errors,
+                      montant: `Le montant ne peut pas dépasser ${remainingAmount?.toLocaleString()} MAD`
+                    });
+                    return;
+                  }
+                  setErrors({
+                    ...errors,
+                    montant: undefined
+                  });
+                  handleFieldChange(index, "montant", value);
+                }}
+                max={isCompletion ? remainingAmount : undefined}
+                min={0}
+                step="0.01"
+                placeholder={`Entrez un montant (max: ${remainingAmount?.toLocaleString()} MAD)`}
                 className={`mt-1 block w-full rounded-md shadow-sm ${
                   errors.montant
                     ? "border-red-300 focus:border-red-500 focus:ring-red-500"
@@ -338,86 +354,71 @@ function PaymentForm({
               )}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Mois de paiement
-              </label>
-              <input
-                type="month"
-                value={payment.mois_paiement}
-                onChange={(e) => {
-                  const newData = [...formData];
-                  newData[index] = {
-                    ...newData[index],
-                    mois_paiement: e.target.value,
-                  };
-                  setFormData(newData);
-                }}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              />
-            </div>
+            {!isCompletion && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Mois de paiement
+                </label>
+                <input
+                  type="month"
+                  value={payment.mois_paiement}
+                  onChange={(e) => {
+                    const newData = [...formData];
+                    newData[index] = {
+                      ...newData[index],
+                      mois_paiement: e.target.value,
+                    };
+                    setFormData(newData);
+                  }}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+            )}
           </div>
 
           {/* Financial Details Grid */}
-          <div className="grid grid-cols-3 gap-4">
-            {/* Prix Subscription Display */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Prix Souscription
-              </label>
-              <input
-                type="number"
-                readOnly
-                className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm"
-                value={groups.find(g => g.id === payment.groupe_id)?.prix_subscription || 0}
-              />
-            </div>
+          <div className="grid grid-cols-1 gap-4">
+            {!isCompletion && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Prix Souscription
+                  </label>
+                  <input
+                    type="number"
+                    readOnly
+                    className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm"
+                    value={groups.find(g => g.id === payment.groupe_id)?.prix_subscription || 0}
+                  />
+                </div>
 
-            {/* Commission Percentage Input */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Commission (%)
-              </label>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                step="1"
-                placeholder="Entrez le % de commission"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                value={payment.commission_percentage || ''}
-                onChange={(e) => {
-                  const newCommissionPercentage = e.target.value === '' 
-                    ? null 
-                    : parseInt(e.target.value, 10);
-                  
-                  handleFieldChange(index, "commission_percentage", newCommissionPercentage);
-                }}
-              />
-              {errors.commission_percentage && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.commission_percentage}
-                </p>
-              )}
-            </div>
-
-            {/* Commission Calculation Display */}
-            {payment.commission_percentage !== null && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Montant Commission
-                </label>
-                <input
-                  type="number"
-                  readOnly
-                  className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm"
-                  value={
-                    groups.find(g => g.id === payment.groupe_id)?.prix_subscription 
-                    ? Math.round((groups.find(g => g.id === payment.groupe_id)?.prix_subscription * payment.commission_percentage) / 100)
-                    : 0
-                  }
-                />
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Commission (%)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    placeholder="Entrez le % de commission"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    value={payment.commission_percentage || ''}
+                    onChange={(e) => {
+                      const newCommissionPercentage = e.target.value === '' 
+                        ? null 
+                        : parseInt(e.target.value, 10);
+                      
+                      handleFieldChange(index, "commission_percentage", newCommissionPercentage);
+                    }}
+                  />
+                  {errors.commission_percentage && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.commission_percentage}
+                    </p>
+                  )}
+                </div>
+              </>
             )}
           </div>
 
