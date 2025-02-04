@@ -412,6 +412,14 @@ function PaymentForm({
                       handleFieldChange(index, "commission_percentage", newCommissionPercentage);
                     }}
                   />
+                  {payment.commission_percentage && payment.groupe_id && (
+                    <p className="mt-1 text-sm text-gray-600">
+                      Prix de la commission: {(
+                        (payment.commission_percentage / 100) * 
+                        groups.find(g => g.id === payment.groupe_id)?.prix_subscription || 0
+                      ).toLocaleString()} MAD
+                    </p>
+                  )}
                   {errors.commission_percentage && (
                     <p className="mt-1 text-sm text-red-500">
                       {errors.commission_percentage}
