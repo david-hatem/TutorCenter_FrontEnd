@@ -55,13 +55,13 @@ function PaymentForm({
     }
   }, [isCompletion, remainingAmount]);
 
-  const [selectedProfesseurs, setSelectedProfesseurs] = useState<{[key: number]: number[]}>({});
+  const [selectedProfesseurs, setSelectedProfesseurs] = useState<{ [key: number]: number[] }>({});
 
   const handleProfesseurToggle = (paymentIndex: number, professeurId: number) => {
     setFormData((prev) => {
       const newData = [...prev];
       const currentProfesseurs = newData[paymentIndex].professeurs || [];
-      
+
       if (currentProfesseurs.includes(professeurId)) {
         // Remove professor if already selected
         newData[paymentIndex] = {
@@ -75,21 +75,21 @@ function PaymentForm({
           professeurs: [...currentProfesseurs, professeurId]
         };
       }
-      
+
       return newData;
     });
   };
 
   const [data, setData] = useState([]);
   const [pays, setPays] = useState<any>([]);
-  const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [buttonsDisabled, setButtonsDisabled] = useState(
     Array(groups.length).fill(false)
   );
 
   const validateForm = (data: PaymentFormData) => {
-    const newErrors: {[key: string]: string} = {};
-    
+    const newErrors: { [key: string]: string } = {};
+
     if (data.montant <= 0) {
       newErrors.montant = "Le montant doit être supérieur à 0";
     }
@@ -117,15 +117,129 @@ function PaymentForm({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate all form data entries
     const isValid = formData.every(validateForm);
     if (!isValid) return;
 
     try {
       if (isCompletion) {
-        await updatePayment({ montant: formData[0].montant }, id);
+        const updatedPay = await updatePayment({ montant: formData[0].montant }, id);
         fetch();
+        if (updatedPay) {
+          // setPays(updatedPay);
+          // onSubmit(formData);
+          fetch();
+          fetch2();
+
+          // Open a single print window for all payments
+          const printWindow = window.open("", "_blank");
+          if (!printWindow) return;
+
+          // Start the HTML document
+          printWindow.document.write(`
+            <html>
+              <head>
+                <title>Reçus de Paiement</title>
+                <style>
+                  body {
+                    font-family: system-ui, -apple-system, sans-serif;
+                    line-height: 1.5;
+                    margin: 0;
+                    padding: 20px;
+                  }
+                  .print-content {
+                    max-width: 800px;
+                    margin: 0 auto;
+                  }
+                  .text-center { text-align: center; }
+                  .mb-8 { margin-bottom: 2rem; }
+                  .mb-2 { margin-bottom: 0.5rem; }
+                  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+                  .font-bold { font-weight: bold; }
+                  .text-2xl { font-size: 1.5rem; }
+                  .text-sm { font-size: 0.875rem; }
+                  .text-gray-500 { color: #6b7280; }
+                  .border-t { border-top: 1px solid #e5e7eb; }
+                  .pt-4 { padding-top: 1rem; }
+                  .payment-receipt {
+                    border-bottom: 2px dashed #e5e7eb;
+                    margin-bottom: 2rem;
+                    padding-bottom: 2rem;
+                  }
+                  .payment-receipt:last-child {
+                    border-bottom: none;
+                    margin-bottom: 0;
+                  }
+                  @media print {
+                    body { print-color-adjust: exact; }
+                    .payment-receipt { page-break-inside: avoid; }
+                  }
+                </style>
+              </head>
+              <body>
+                <div class="print-content">
+          `);
+
+          // Add each payment receipt
+          // updatedPay.forEach((paymentResponse, index) => {
+          const payment = updatedPay.payment;
+          printWindow.document.write(`
+              <div class="payment-receipt">
+                <div class="text-center mb-8">
+              <div className="grid grid-cols-2 mb-8 items-center w-full">
+                <div className="mr-auto w-1/2">
+                  <p className="mr-auto">${new Date(payment.date_paiement).toLocaleString('fr-FR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                  })}</p>
+                </div>
+                <div className="w-1/2">
+                  <img className="ml-auto mr-[-22px] ml-[-22px]" src=${Logo} width=${80} height=${80} />
+                </div>
+              </div>
+                  <p class="text-sm text-gray-500">
+                    Date: ${new Date(payment.date_paiement).toLocaleString('fr-FR')}
+                  </p>
+                </div>
+  
+                <div class="grid mb-8">
+                  <div>
+                    <h2 class="font-bold mb-2">Informations de l'étudiant</h2>
+                    <p>Nom: ${payment.etudiant.prenom} ${payment.etudiant.nom}</p>
+                    <p>Téléphone: ${payment.etudiant.telephone || 'Non spécifié'}</p>
+                    <p>Adresse: ${payment.etudiant.adresse || 'Non spécifiée'}</p>
+                  </div>
+                  <div>
+                    <h2 class="font-bold mb-2">Détails du paiement</h2>
+                    <p>Groupe: ${payment.groupe.nom_groupe}</p>
+                    <p>Montant payé: ${payment.montant.toLocaleString()} MAD</p>
+                    <p>Reste à payer: ${(payment.groupe.prix_subscription - payment.montant_total).toLocaleString()} MAD</p>
+                    ${payment.frais_inscription > 0 ?
+              `<p>Frais d'inscription: ${payment.frais_inscription.toLocaleString()} MAD</p>`
+              : ''}
+                  </div>
+                </div>
+              </div>
+            `);
+          // });
+
+          // Close the HTML document
+          printWindow.document.write(`
+                </div>
+                <script>
+                  window.onload = function() {
+                    window.print();
+                  }
+                </script>
+              </body>
+            </html>
+          `);
+          printWindow.document.close();
+        } else {
+          setErrors({ submit: "Failed to create payment. Please try again." });
+        }
         onClose();
         return;
       }
@@ -222,9 +336,9 @@ function PaymentForm({
                   <p>Groupe: ${payment.groupe.nom_groupe}</p>
                   <p>Montant payé: ${payment.montant.toLocaleString()} MAD</p>
                   <p>Reste à payer: ${(payment.groupe.prix_subscription - payment.montant_total).toLocaleString()} MAD</p>
-                  ${payment.frais_inscription > 0 ? 
-                    `<p>Frais d'inscription: ${payment.frais_inscription.toLocaleString()} MAD</p>` 
-                    : ''}
+                  ${payment.frais_inscription > 0 ?
+              `<p>Frais d'inscription: ${payment.frais_inscription.toLocaleString()} MAD</p>`
+              : ''}
                 </div>
               </div>
             </div>
@@ -356,11 +470,10 @@ function PaymentForm({
                 min={0}
                 step="0.01"
                 placeholder={`Entrez un montant (max: ${remainingAmount?.toLocaleString()} MAD)`}
-                className={`mt-1 block w-full rounded-md shadow-sm ${
-                  errors.montant
+                className={`mt-1 block w-full rounded-md shadow-sm ${errors.montant
                     ? "border-red-300 focus:border-red-500 focus:ring-red-500"
                     : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                }`}
+                  }`}
                 required
               />
               {errors.montant && (
@@ -419,17 +532,17 @@ function PaymentForm({
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     value={payment.commission_percentage || ''}
                     onChange={(e) => {
-                      const newCommissionPercentage = e.target.value === '' 
-                        ? null 
+                      const newCommissionPercentage = e.target.value === ''
+                        ? null
                         : parseInt(e.target.value, 10);
-                      
+
                       handleFieldChange(index, "commission_percentage", newCommissionPercentage);
                     }}
                   />
                   {payment.commission_percentage && payment.groupe_id && (
                     <p className="mt-1 text-sm text-gray-600">
                       Prix de la commission: {(
-                        (payment.commission_percentage / 100) * 
+                        (payment.commission_percentage / 100) *
                         groups.find(g => g.id === payment.groupe_id)?.prix_subscription || 0
                       ).toLocaleString()} MAD
                     </p>
@@ -482,11 +595,10 @@ function PaymentForm({
                         parseFloat(e.target.value)
                       )
                     }
-                    className={`mt-1 block w-full rounded-md shadow-sm ${
-                      errors.frais_inscription
+                    className={`mt-1 block w-full rounded-md shadow-sm ${errors.frais_inscription
                         ? "border-red-300 focus:border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    }`}
+                      }`}
                     required
                   />
                   {errors.frais_inscription && (
@@ -509,11 +621,10 @@ function PaymentForm({
                     // Reset selected professors when group changes
                     handleFieldChange(index, "professeurs", []);
                   }}
-                  className={`mt-1 block w-full rounded-md shadow-sm ${
-                    errors.groupe_id
+                  className={`mt-1 block w-full rounded-md shadow-sm ${errors.groupe_id
                       ? "border-red-300 focus:border-red-500 focus:ring-red-500"
                       : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  }`}
+                    }`}
                   required
                 >
                   <option value="">Sélectionner un groupe</option>
