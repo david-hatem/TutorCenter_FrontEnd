@@ -254,6 +254,25 @@ function Dashboard() {
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-lg font-semibold mb-4">Paiements et Commissions</h2>
           <div className="h-[400px]">
+          <div className='mb-5'>
+            <label className="block text-sm font-medium text-gray-700">
+              Year
+            </label>
+            <input
+              type="number"
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              defaultValue={new Date().getFullYear()}
+              id="year" name="year" min="1900" max="2100" step="1"
+            />
+            <button
+            type="button"
+            onClick={()=>{}}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            submit
+          </button>
+          </div>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={paymentsData}

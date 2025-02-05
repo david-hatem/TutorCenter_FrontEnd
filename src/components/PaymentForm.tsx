@@ -4,6 +4,8 @@ import { createPayment, fetchGroupeList, updatePayment } from "../services/api";
 import { Check, Minus, Plus, Printer } from "lucide-react";
 import { Paiement } from "./../types/index";
 import Modal from "./Modal";
+import Logo from "../../src/imgs/Abstract Modern Triangle Logo Template.png";
+
 
 interface PaymentFormProps {
   onSubmit: (data: PaymentFormData) => void;
@@ -190,6 +192,18 @@ function PaymentForm({
           printWindow.document.write(`
             <div class="payment-receipt">
               <div class="text-center mb-8">
+              <div className="grid grid-cols-2 mb-8 items-center w-full">
+          <div className="mr-auto w-1/2">
+          <p className="mr-auto">${new Date(payment.date_paiement).toLocaleString('fr-FR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          })}</p>
+          </div>
+          <div className="w-1/2">
+          <img className="ml-auto mr-[-22px] ml-[-22px]" src=${Logo} width=${80} height=${80} />
+          </div>
+        </div>
                 <h1 class="text-2xl font-bold">Reçu de Paiement ${createdPay.length > 1 ? `#${index + 1}` : ''}</h1>
                 <p class="text-sm text-gray-500">
                   Date: ${new Date(payment.date_paiement).toLocaleString('fr-FR')}

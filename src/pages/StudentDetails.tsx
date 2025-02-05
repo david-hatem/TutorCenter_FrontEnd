@@ -12,6 +12,13 @@ import {
   updateStudent,
 } from "../services/api";
 
+import Logo from "../../src/imgs/Abstract Modern Triangle Logo Template.png";
+import { Check, Minus, Plus, Printer } from "lucide-react";
+
+
+
+
+
 interface StudentDetails {
   id: number;
   nom: string;
@@ -65,6 +72,7 @@ function StudentDetails() {
   const [student, setStudent] = useState<StudentDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isStdModalOpen, setIsStdModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [error, setError] = useState("");
@@ -417,6 +425,143 @@ function StudentDetails() {
     }
   };
 
+  const printPayment = () => {
+    const printContent = document.getElementById("printable-std");
+    if (!printContent) return;
+
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Payment Receipt</title>
+          <style>
+            body {
+              font-family: system-ui, -apple-system, sans-serif;
+              line-height: 1.5;
+              margin: 0;
+              padding: 20px;
+            }
+            .print-content {
+              max-width: 800px;
+              margin: 0 auto;
+            }
+            .grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 1rem;
+            }
+            .text-center { text-align: center; }
+            .text-right { text-align: right; }
+            .mb-8 { margin-bottom: 2rem; }
+            .mb-2 { margin-bottom: 0.5rem; }
+            .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+            .font-bold { font-weight: bold; }
+            .text-2xl { font-size: 1.5rem; }
+            .text-sm { font-size: 0.875rem; }
+            .text-gray-500 { color: #6b7280; }
+            .border-t { border-top: 1px solid #e5e7eb; }
+            .border-b { border-bottom: 1px solid #e5e7eb; }
+            @media print {
+              body { print-color-adjust: exact; }
+            }
+          </style>
+        </head>
+        <body>
+          ${printContent.outerHTML}
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
+  };
+  
+
+  function PrintableStudent({ std }: { std: StudentDetails }) {
+    return (
+      <div>
+        <div className="px-8 pb-8 bg-white" id="printable-std">
+        <div className="text-center mb-8">
+          <div className="grid grid-cols-2 mb-8 items-center w-full">
+            <div className="mr-auto w-1/2">
+            <p className="mr-auto">{new Date(std.created_at).toLocaleString('fr-FR', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+            })}</p>
+            </div>
+            <div className="w-1/2">
+            <img className="ml-auto mr-[-22px] ml-[-22px]" src={Logo} width={80} height={80} />
+            </div>
+          </div>
+          <hr className="mb-8" />
+          <h1 className="text-2xl font-bold">Student Details</h1>
+          <p className="text-gray-500">#{std.id}</p>
+        </div>
+  
+        <div className="grid grid-cols-1 gap-4 mb-8">
+          <div>
+            <h2 className="font-bold mb-2">Informations de l'Étudiant</h2>
+            <p>
+              {std.prenom} {std.nom}xxx
+            </p>
+            <p>Telephone : {std.telephone}</p>
+            <p>Adresse : {std.adresse}</p>
+            <p>Sex : {std.sexe}</p>
+            <p>Nationalite : {std.nationalite}</p>
+            <p>Total Payments : {std.total_paiements}</p>
+            <p>Birth Date : {new Date(std.date_naissance).toLocaleString('fr-FR', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+            })}</p>
+          </div>
+          {/* <div className="text-right">
+            <h2 className="font-bold mb-2">Détails du Paiement</h2>
+            <p>Birth Date : {new Date(std.date_naissance).toLocaleString('fr-FR', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+            })}</p>
+            
+          </div> */}
+        </div>
+  
+        {/* <div className="border-t border-b border-gray-200 py-4 mb-8"> */}
+          {/* <div className="flex justify-between mb-2">
+            <span className="font-bold">Montant Payé :</span>
+          </div> */}
+          {/* <div className="flex justify-between">
+            <span className="font-bold">Taux de Commission :</span>
+            <span>{payment.commission_percentage}%</span>
+          </div> */}
+        {/* </div> */}
+  
+        {/* <div className="text-center text-sm text-gray-500">
+          <p>Merci pour votre paiement !</p>
+          <p>Ceci est un document généré par ordinateur.</p>
+        </div> */}
+
+      </div>
+      <button
+            onClick={printPayment}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+          >
+            <Printer /> Print
+          </button>
+      </div>
+    );
+  }
+
+
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -430,6 +575,12 @@ function StudentDetails() {
           <h1 className="text-2xl font-bold text-gray-900">Détails de l'étudiant</h1>
         </div>
         <div className="flex space-x-3">
+        <button
+            onClick={() => setIsStdModalOpen(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+          >
+            Print
+          </button>
           <button
             onClick={() => setIsPaymentModalOpen(true)}
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
@@ -658,6 +809,15 @@ function StudentDetails() {
           </div>
         </div>
       </div>
+
+
+      <Modal
+        isOpen={isStdModalOpen}
+        onClose={() => setIsStdModalOpen(false)}
+        title="Print"
+      >
+        <PrintableStudent std={student} />
+      </Modal>
 
       <Modal
         isOpen={isPaymentModalOpen}

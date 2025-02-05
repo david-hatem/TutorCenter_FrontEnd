@@ -7,6 +7,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Printer, PlusCircle } from "lucide-react";
 import type { Payment, PaymentFormData, Group } from "../types";
 import { fetchGroupeList } from "../services/api";
+import Logo from "../../src/imgs/Abstract Modern Triangle Logo Template.png";
 
 interface FiltersProps {
   groups: Group[];
@@ -96,7 +97,7 @@ function Filters({ groups, students, filters, onFilterChange }: FiltersProps) {
         >
           <option value="">Tous les groupes</option>
           {groups
-            .filter(group => 
+            .filter(group =>
               (!filters.filiereId || group.filiere?.id === filters.filiereId) &&
               (!filters.niveauId || group.niveau?.id === filters.niveauId)
             )
@@ -210,11 +211,10 @@ const columns: ColumnDef<Payment>[] = [
     accessorKey: "statut_paiement",
     cell: ({ row }) => (
       <span
-        className={`px-2 py-1 rounded-full text-xs ${
-          row.original.statut_paiement.toLowerCase() === "paid"
+        className={`px-2 py-1 rounded-full text-xs ${row.original.statut_paiement.toLowerCase() === "paid"
             ? "bg-green-100 text-green-800"
             : "bg-yellow-100 text-yellow-800"
-        }`}
+          }`}
       >
         {row.original.statut_paiement.toLowerCase()}
       </span>
@@ -359,8 +359,21 @@ const initialData: Payment[] = [
 
 function PrintablePayment({ payment }: { payment: Payment }) {
   return (
-    <div className="p-8 bg-white" id="printable-payment">
+    <div className="px-8 pb-8 bg-white" id="printable-payment">
       <div className="text-center mb-8">
+        <div className="grid grid-cols-2 mb-8 items-center w-full">
+          <div className="mr-auto w-1/2">
+          <p className="mr-auto">{new Date(payment.date_paiement).toLocaleString('fr-FR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          })}</p>
+          </div>
+          <div className="w-1/2">
+          <img className="ml-auto mr-[-22px] ml-[-22px]" src={Logo} width={80} height={80} />
+          </div>
+        </div>
+        <hr className="mb-8" />
         <h1 className="text-2xl font-bold">Reçu de Paiement</h1>
         <p className="text-gray-500">#{payment.id}</p>
       </div>
@@ -377,12 +390,12 @@ function PrintablePayment({ payment }: { payment: Payment }) {
         <div className="text-right">
           <h2 className="font-bold mb-2">Détails du Paiement</h2>
           <p>Date : {new Date(payment.date_paiement).toLocaleString('fr-FR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      })}</p>
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+          })}</p>
           <p>Mois : {payment.month_name}</p>
           <p>Statut : {payment.statut_paiement}</p>
           <p>Groupe : {payment.groupe.nom_groupe}</p>
@@ -449,7 +462,7 @@ function Payments() {
       }
       const data = await response.json();
       setPayments(data.results);
-      
+
       // Extract unique students from payments
       const uniqueStudents = Array.from(
         new Map(
@@ -460,7 +473,7 @@ function Payments() {
         ).values()
       );
       setStudents(uniqueStudents);
-      
+
       // Calculate total amount from filtered payments
       setTotalAmount(data.results.reduce((sum, p) => sum + p.montant, 0));
     } catch (err) {
@@ -472,7 +485,7 @@ function Payments() {
 
   useEffect(() => {
     fetchPayments();
-    
+
     // Fetch groups
     const getGroups = async () => {
       try {
@@ -685,7 +698,7 @@ function Payments() {
                 setSearchQuery(e.target.value);
                 const query = e.target.value.toLowerCase();
                 let filtered = [...payments];
-                
+
                 // Filter by student name
                 if (query) {
                   filtered = filtered.filter(
