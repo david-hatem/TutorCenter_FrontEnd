@@ -530,7 +530,7 @@ function PaymentForm({
                     step="1"
                     placeholder="Entrez le % de commission"
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    value={payment.commission_percentage || ''}
+                    value={payment.commission_percentage || '100'}
                     onChange={(e) => {
                       const newCommissionPercentage = e.target.value === ''
                         ? null

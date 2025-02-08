@@ -254,6 +254,7 @@ function Dashboard() {
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-lg font-semibold mb-4">Paiements et Commissions</h2>
           <div className="h-[400px]">
+          {/*
           <div className='mb-5'>
             <label className="block text-sm font-medium text-gray-700">
               Year
@@ -273,6 +274,7 @@ function Dashboard() {
             submit
           </button>
           </div>
+          */}
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={paymentsData}
